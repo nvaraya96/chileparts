@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Condiciones | Chile Parts</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;600;700&display=swap');
+
+:root {
+  --rojo: #CC0000;
+  --rojo-vivo: #FF0000;
+  --negro: #0a0a0a;
+  --gris-medio: #1a1a1a;
+  --gris-borde: #2a2a2a;
+  --blanco: #ffffff;
+  --blanco-suave: #e8e8e8;
+  --texto-gris: #999999;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { background: var(--negro); color: var(--blanco); font-family: 'Barlow', sans-serif; overflow-x: hidden; }
+
+.topbar { background: var(--rojo); padding: 8px 40px; display: flex; justify-content: flex-end; align-items: center; gap: 24px; font-family: 'Barlow Condensed', sans-serif; font-size: 13px; letter-spacing: 1px; }
+.topbar a { color: white; text-decoration: none; display: flex; align-items: center; gap: 6px; opacity: 0.9; transition: opacity 0.2s; }
+.topbar a:hover { opacity: 1; }
+
+header { background: var(--negro); border-bottom: 1px solid var(--gris-borde); padding: 16px 40px; display: flex; align-items: center; justify-content: space-between; }
+.header-logo img { height: 70px; object-fit: contain; }
+
+.nav-banner { background: var(--gris-medio); border-bottom: 2px solid var(--gris-borde); }
+.nav-banner-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: stretch; }
+.nav-banner-item { flex: 1; text-align: center; position: relative; }
+.nav-banner-item a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 18px 12px; color: var(--texto-gris); text-decoration: none; font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; transition: all 0.2s; border-right: 1px solid var(--gris-borde); height: 100%; }
+.nav-banner-item:last-child a { border-right: none; }
+.nav-banner-item a:hover { color: var(--blanco); background: rgba(255,255,255,0.04); }
+.nav-banner-item a.active { color: var(--blanco); background: rgba(204,0,0,0.1); border-bottom: 3px solid var(--rojo); }
+.nav-banner-item.cotizar a { background: var(--rojo); color: white; font-weight: 700; }
+.nav-banner-item.cotizar a:hover { background: var(--rojo-vivo); color: white; }
+.nav-icon { font-size: 18px; line-height: 1; }
+
+.page-hero { background: linear-gradient(135deg, rgba(204,0,0,0.08) 0%, transparent 50%), var(--gris-medio); border-bottom: 1px solid var(--gris-borde); padding: 60px 40px; position: relative; overflow: hidden; }
+.page-hero::before { content: ''; position: absolute; top: -50%; right: -10%; width: 400px; height: 400px; background: radial-gradient(circle, rgba(204,0,0,0.06) 0%, transparent 70%); pointer-events: none; }
+.page-hero-inner { max-width: 1200px; margin: 0 auto; }
+.page-tag { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; letter-spacing: 4px; text-transform: uppercase; color: var(--rojo); margin-bottom: 12px; display: block; }
+.page-title { font-family: 'Bebas Neue', sans-serif; font-size: 64px; line-height: 1; letter-spacing: 2px; }
+.page-title span { color: var(--rojo); }
+.page-subtitle { margin-top: 16px; font-size: 17px; color: var(--texto-gris); max-width: 600px; line-height: 1.7; }
+
+.main-content { max-width: 1200px; margin: 0 auto; padding: 80px 40px; }
+.section-tag { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; letter-spacing: 4px; text-transform: uppercase; color: var(--rojo); margin-bottom: 16px; display: block; }
+.section-title { font-family: 'Bebas Neue', sans-serif; font-size: 56px; line-height: 1; margin-bottom: 20px; }
+.section-title span { color: var(--rojo); }
+.section-body { font-size: 16px; color: #aaa; line-height: 1.8; max-width: 700px; }
+
+.cards-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-top: 60px; }
+.card { border: 1px solid var(--gris-borde); padding: 36px; border-radius: 2px; transition: border-color 0.2s, transform 0.2s; position: relative; overflow: hidden; }
+.card::before { content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%; background: var(--rojo); transform: scaleY(0); transition: transform 0.25s; transform-origin: bottom; }
+.card:hover { border-color: #444; transform: translateY(-4px); }
+.card:hover::before { transform: scaleY(1); }
+.card-icon { font-size: 28px; margin-bottom: 16px; display: block; }
+.card h3 { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; color: var(--blanco); }
+.card p { font-size: 14px; color: var(--texto-gris); line-height: 1.7; }
+
+.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; margin-top: 60px; background: var(--gris-borde); }
+.step { background: var(--gris-medio); padding: 40px 32px; position: relative; transition: background 0.2s; }
+.step:hover { background: #222; }
+.step-num { font-family: 'Bebas Neue', sans-serif; font-size: 80px; color: rgba(204,0,0,0.12); line-height: 1; position: absolute; top: 16px; right: 16px; }
+.step-icon { font-size: 32px; margin-bottom: 16px; }
+.step h3 { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; }
+.step p { font-size: 14px; color: var(--texto-gris); line-height: 1.7; }
+
+form { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.form-group { display: flex; flex-direction: column; gap: 8px; }
+.form-group.full { grid-column: 1 / -1; }
+label { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--texto-gris); font-weight: 600; }
+input, select, textarea { background: #161616; border: 1px solid var(--gris-borde); color: var(--blanco); padding: 14px 16px; font-family: 'Barlow', sans-serif; font-size: 15px; border-radius: 2px; transition: border-color 0.2s; outline: none; width: 100%; }
+input:focus, select:focus, textarea:focus { border-color: var(--rojo); }
+input::placeholder, textarea::placeholder { color: #555; }
+select option { background: #1a1a1a; }
+textarea { resize: vertical; min-height: 120px; }
+.submit-btn { grid-column: 1 / -1; background: var(--rojo); color: white; border: none; padding: 18px; font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; cursor: pointer; border-radius: 2px; transition: all 0.2s; margin-top: 8px; }
+.submit-btn:hover { background: var(--rojo-vivo); box-shadow: 0 8px 30px rgba(204,0,0,0.4); transform: translateY(-2px); }
+.success-msg { display: none; grid-column: 1/-1; background: rgba(0,180,0,0.1); border: 1px solid #00b400; padding: 20px; color: #00cc00; font-family: 'Barlow Condensed'; font-size: 16px; letter-spacing: 1px; text-align: center; }
+
+footer { background: var(--gris-medio); border-top: 1px solid var(--gris-borde); padding: 60px 40px 30px; }
+.footer-inner { max-width: 1200px; margin: 0 auto; }
+.footer-top { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 60px; padding-bottom: 40px; border-bottom: 1px solid var(--gris-borde); margin-bottom: 30px; }
+.footer-logo img { height: 55px; margin-bottom: 16px; }
+.footer-desc { font-size: 14px; color: var(--texto-gris); line-height: 1.7; max-width: 300px; }
+.footer-col h4 { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; letter-spacing: 3px; text-transform: uppercase; color: var(--rojo); margin-bottom: 20px; }
+.footer-col ul { list-style: none; }
+.footer-col ul li { margin-bottom: 10px; }
+.footer-col ul li a { color: var(--texto-gris); text-decoration: none; font-size: 14px; transition: color 0.2s; }
+.footer-col ul li a:hover { color: var(--blanco); }
+.footer-bottom { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--texto-gris); }
+.footer-bottom span { color: var(--rojo); }
+
+.wa-float { position: fixed; bottom: 32px; right: 32px; z-index: 999; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+.wa-btn { width: 60px; height: 60px; background: #25D366; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; box-shadow: 0 4px 20px rgba(37,211,102,0.5); transition: all 0.2s; animation: wa-pulse 2.5s infinite; }
+.wa-btn:hover { transform: scale(1.1); box-shadow: 0 6px 30px rgba(37,211,102,0.7); }
+.wa-btn svg { width: 32px; height: 32px; fill: white; }
+.wa-tooltip { background: rgba(0,0,0,0.85); color: white; padding: 8px 14px; border-radius: 6px; font-family: 'Barlow', sans-serif; font-size: 13px; white-space: nowrap; opacity: 0; transform: translateX(10px); transition: all 0.2s; pointer-events: none; }
+.wa-float:hover .wa-tooltip { opacity: 1; transform: translateX(0); }
+@keyframes wa-pulse { 0%,100% { box-shadow: 0 4px 20px rgba(37,211,102,0.5); } 50% { box-shadow: 0 4px 30px rgba(37,211,102,0.8), 0 0 0 10px rgba(37,211,102,0.1); } }
+
+@media (max-width: 768px) {
+  .topbar { padding: 8px 16px; font-size: 11px; }
+  header { padding: 12px 16px; }
+  .header-logo img { height: 40px; }
+  .nav-banner-inner { overflow-x: auto; }
+  .nav-banner-item a { padding: 14px 10px; font-size: 11px; letter-spacing: 1px; }
+  .page-hero { padding: 40px 20px; }
+  .page-title { font-size: 44px; }
+  .main-content { padding: 50px 20px; }
+  .cards-grid { grid-template-columns: 1fr; }
+  .steps { grid-template-columns: 1fr; }
+  form { grid-template-columns: 1fr; }
+  .form-group.full { grid-column: 1; }
+  .submit-btn { grid-column: 1; }
+  .success-msg { grid-column: 1; }
+  .footer-top { grid-template-columns: 1fr; gap: 30px; }
+  .footer-bottom { flex-direction: column; gap: 8px; text-align: center; }
+}
+</style>
+</head>
+<body>
+<div class="topbar"><a href="https://wa.me/56927176437">📱 +56 9 2717 6437</a><a href="mailto:contacto@chileparts.cl">✉️ contacto@chileparts.cl</a></div>
+<header>
+  <div class="header-logo">
+    <a href="index.html" style="text-decoration:none;display:flex;align-items:center;gap:10px;">
+      <span style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:3px;color:#fff;line-height:1;">CHILE<span style="color:#CC0000;">PARTS</span></span>
+      <span style="font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#666;border-left:1px solid #333;padding-left:10px;line-height:1.4;">Importación<br>de Repuestos</span>
+    </a>
+  </div>
+</header>
+<nav class="nav-banner"><div class="nav-banner-inner"><div class="nav-banner-item"><a href="index.html" class=""><span class="nav-icon">🏠</span><span>Inicio</span></a></div><div class="nav-banner-item"><a href="historia.html" class=""><span class="nav-icon">📖</span><span>Historia</span></a></div><div class="nav-banner-item"><a href="como-funciona.html" class=""><span class="nav-icon">⚙️</span><span>Cómo Funciona</span></a></div><div class="nav-banner-item"><a href="medios-de-pago.html" class=""><span class="nav-icon">💳</span><span>Medios de Pago</span></a></div><div class="nav-banner-item"><a href="condiciones.html" class="active"><span class="nav-icon">📋</span><span>Condiciones</span></a></div><div class="nav-banner-item"><a href="garantias.html" class=""><span class="nav-icon">🛡️</span><span>Garantías</span></a></div><div class="nav-banner-item"><a href="compromiso.html" class=""><span class="nav-icon">🤝</span><span>Compromiso</span></a></div><div class="nav-banner-item"><a href="asesoria.html" class=""><span class="nav-icon">🔧</span><span>Asesoría</span></a></div><div class="nav-banner-item cotizar"><a href="cotizacion.html" class=""><span class="nav-icon">💬</span><span>Cotizar</span></a></div></div></nav>
+<div class="page-hero"><div class="page-hero-inner"><span class="page-tag">// Condiciones Generales</span><h1 class="page-title">CONDICIONES <span>GENERALES</span></h1><p class="page-subtitle">Todo lo que necesitas saber antes de cotizar. Transparente y sin sorpresas.</p></div></div>
+<div class="main-content">
+  <div class="cards-grid">
+
+    <div class="card">
+      <span class="card-icon">⏱️</span>
+      <h3>Tiempos de Entrega</h3>
+      <p>Los plazos varían según el origen y la disponibilidad de la pieza. Al momento de cotizar informamos el tiempo estimado sin comprometer plazos que no podemos cumplir. Los tiempos de importación pueden verse afectados por aduanas, logística y factores externos.</p>
+    </div>
+
+    <div class="card">
+      <span class="card-icon">🚚</span>
+      <h3>Despacho a Todo Chile</h3>
+      <p>Despachamos a cualquier región del país a través de Chile Express, Starken o el servicio de courier que el cliente indique. El costo del despacho se informa al momento de coordinar la entrega y es de cargo del cliente.</p>
+    </div>
+
+    <div class="card">
+      <span class="card-icon">🔄</span>
+      <h3>Cambios por Pieza Incorrecta</h3>
+      <p>Si la pieza entregada no corresponde a la solicitada por un error nuestro, gestionamos el cambio sin costo adicional para el cliente. Esto aplica exclusivamente cuando el error es atribuible a Chile Parts.</p>
+    </div>
+
+    <div class="card" style="border-color:rgba(204,0,0,0.3);">
+      <span class="card-icon">🚫</span>
+      <h3>No hay devoluciones por arrepentimiento</h3>
+      <p>Una vez confirmado el pedido y realizado el primer pago, no se aceptan devoluciones ni cambios por arrepentimiento. El proceso de importación se activa desde el momento del pago y no es reversible.</p>
+    </div>
+
+    <div class="card">
+      <span class="card-icon">📄</span>
+      <h3>Documentación</h3>
+      <p>Todos los productos cuentan con documentación de importación válida. Emitimos boleta o factura según corresponda para tus registros.</p>
+    </div>
+
+    <div class="card">
+      <span class="card-icon">⚠️</span>
+      <h3>Compatibilidad</h3>
+      <p>El cliente es responsable de verificar que los datos del vehículo entregados son correctos. Recomendamos incluir el número de chasis (VIN) para asegurar compatibilidad exacta. Chile Parts no se hace responsable por incompatibilidad derivada de información incorrecta entregada por el cliente.</p>
+    </div>
+
+  </div>
+</div>
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div>
+        <div style="margin-bottom:16px;">
+          <span style="font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:3px;color:#fff;line-height:1;">CHILE<span style="color:#CC0000;">PARTS</span></span><br>
+          <span style="font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:3px;text-transform:uppercase;color:#666;">Importación de Repuestos</span>
+        </div>
+        <p class="footer-desc">Especialistas en importación de repuestos para vehículos de alta gama y autos clásicos. Autos, camionetas y motocicletas. Cotizamos, importamos y entregamos en todo Chile.</p>
+        <div style="margin-top:20px;">
+          <p style="font-family:'Barlow Condensed';font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--texto-gris);margin-bottom:10px;">Medios de pago</p>
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+            <span style="font-family:'Barlow Condensed';font-size:13px;color:#bbb;border:1px solid var(--gris-borde);padding:5px 12px;border-radius:3px;">🏦 Transferencia</span>
+            <img src="data:image/jpeg;base64,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" alt="Flow" style="height:28px;border-radius:5px;">
+          </div>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Navegación</h4>
+        <ul>
+          <li><a href="historia.html">Nuestra Historia</a></li>
+          <li><a href="como-funciona.html">Cómo Funciona</a></li>
+          <li><a href="medios-de-pago.html">Medios de Pago</a></li>
+          <li><a href="condiciones.html">Condiciones</a></li>
+          <li><a href="garantias.html">Garantías</a></li>
+          <li><a href="compromiso.html">Compromiso</a></li>
+          <li><a href="asesoria.html">Asesoría Personalizada</a></li>
+          <li><a href="cotizacion.html">Cotizar</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Contacto</h4>
+        <ul>
+          <li><a href="https://wa.me/56927176437" target="_blank">+56 9 2717 6437</a></li>
+          <li><a href="mailto:contacto@chileparts.cl">contacto@chileparts.cl</a></li>
+          <li><a href="index.html">chileparts.cl</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2025 Chile Parts · Importación de Repuestos para Vehículos · Todos los derechos reservados</p>
+      <p>Hecho con <span>♥</span> en Chile 🇨🇱</p>
+    </div>
+  </div>
+</footer>
+<div class="wa-float">
+  <div class="wa-tooltip">Escríbenos por WhatsApp</div>
+  <a href="https://wa.me/56927176437" class="wa-btn" target="_blank" rel="noopener">
+    <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+  </a>
+</div>
+<script>
+var form = document.getElementById('cotizacion-form');
+if(form) {
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    document.getElementById('success').style.display = 'block';
+    this.reset();
+    setTimeout(() => { document.getElementById('success').style.display = 'none'; }, 6000);
+  });
+}
+</script>
+</body>
+</html>
