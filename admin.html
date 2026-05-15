@@ -304,6 +304,7 @@ function getFiltered(){
   return data.filter(d=>d.estado===filter);
 }
 
+function esc(s){if(!s)return '';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 function b(cls,txt){return '<span class="badge '+cls+'">'+txt+'</span>';}
 function bfuente(f){return f==='whatsapp'?b('bwa','📱 WA'):f==='instagram'?b('big','📸 IG'):b('bweb','🌐 Web');}
 function bestado(s){
@@ -352,9 +353,9 @@ function detailHTML(q){
     +'<input class="inl" value="'+(q.tracking||'')+'" placeholder="Número seguimiento" onblur="upd('+q.id+',\'tracking\',this.value)"></div></div>'
     +'<div class="drow"><div><div class="dlabel">Fecha estimada</div>'
     +'<input class="inl" type="date" value="'+(q.fecha_estimada||'')+'" onchange="upd('+q.id+',\'fecha_estimada\',this.value)"></div>'
-    +'<div><div class="dlabel">Repuesto</div><div style="font-size:13px;color:#ccc;line-height:1.5">'+q.repuesto+'</div></div></div>'
+    +'<div><div class="dlabel">Repuesto</div><div style="font-size:13px;color:#ccc;line-height:1.5">'+esc(q.repuesto)+'</div></div></div>'
     +'<div class="drow"><div class="dfull"><div class="dlabel">Nota interna</div>'
-    +'<textarea class="inl" onblur="upd('+q.id+',\'nota_interna\',this.value)">'+(q.nota_interna||'')+'</textarea></div></div>'
+    +'<textarea class="inl" onblur="upd('+q.id+',\'nota_interna\',this.value)">'+esc(q.nota_interna||'')+'</textarea></div></div>'
     +'</td></tr>';
 }
 
@@ -363,10 +364,10 @@ function cardHTML(q){
   return '<div style="background:var(--g);border:1px solid var(--b);border-radius:4px;margin-bottom:10px;overflow:hidden;">'
     +'<div style="padding:14px 16px;cursor:pointer;" onclick="toggleExp('+q.id+')">'
     +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">'
-    +'<div style="font-weight:700;font-size:15px;">'+q.nombre+'</div>'
+    +'<div style="font-weight:700;font-size:15px;">'+esc(q.nombre)+'</div>'
     +'<div style="font-size:11px;color:var(--gt)">'+fdate(q.created_at)+'</div></div>'
-    +'<div style="font-size:13px;color:var(--gt);margin-bottom:8px;">'+(q.marca||'')+' '+(q.modelo||'')+' '+(q.anio||'')+'</div>'
-    +'<div style="font-size:13px;color:#ccc;margin-bottom:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+q.repuesto+'</div>'
+    +'<div style="font-size:13px;color:var(--gt);margin-bottom:8px;">'+esc(q.marca||'')+' '+esc(q.modelo||'')+' '+esc(q.anio||'')+'</div>'
+    +'<div style="font-size:13px;color:#ccc;margin-bottom:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+esc(q.repuesto)+'</div>'
     +'<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">'
     +bestado(q.estado)+bfuente(q.fuente)
     +'<div style="margin-left:auto;font-size:12px;color:var(--gt)">'+(isExp?'▲':'▼')+'</div>'
@@ -386,10 +387,10 @@ function cardHTML(q){
       +'<div><div class="dlabel">50% inicial</div>'+sel('pago_inicial',q.id,q.pago_inicial,[['pendiente','⏳ Pendiente'],['pagado','✓ Pagado']])+'</div>'
       +'<div><div class="dlabel">Saldo final</div>'+sel('pago_final',q.id,q.pago_final,[['pendiente','⏳ Pendiente'],['pagado','✓ Pagado']])+'</div>'
       +'</div>'
-      +(q.telefono?'<div style="margin-bottom:8px;font-size:13px;color:#aaa;">📱 <a href="tel:'+q.telefono+'" style="color:#aaa;text-decoration:none;">'+q.telefono+'</a></div>':'')
-      +(q.email?'<div style="margin-bottom:8px;font-size:13px;color:#aaa;">✉ <a href="mailto:'+q.email+'" style="color:#aaa;text-decoration:none;">'+q.email+'</a></div>':'')
+      +(q.telefono?'<div style="margin-bottom:8px;font-size:13px;color:#aaa;">📱 <a href="tel:'+esc(q.telefono)+'" style="color:#aaa;text-decoration:none;">'+esc(q.telefono)+'</a></div>':'')
+      +(q.email?'<div style="margin-bottom:8px;font-size:13px;color:#aaa;">✉ <a href="mailto:'+esc(q.email)+'" style="color:#aaa;text-decoration:none;">'+esc(q.email)+'</a></div>':'')
       +'<div style="margin-bottom:12px;"><div class="dlabel">Nota interna</div>'
-      +'<textarea class="inl" onblur="upd('+q.id+',\'nota_interna\',this.value)">'+(q.nota_interna||'')+'</textarea></div>'
+      +'<textarea class="inl" onblur="upd('+q.id+',\'nota_interna\',this.value)">'+esc(q.nota_interna||'')+'</textarea></div>'
       +'<button class="br bdel" onclick="del('+q.id+')" style="width:100%;margin-top:4px;">✕ Eliminar cotización</button>'
       +'</div>':'')
     +'</div>';
@@ -413,12 +414,12 @@ function render(){
     const row='<tr style="'+(isExp?'background:rgba(204,0,0,.04)':'')+'">'
       +'<td style="color:var(--gt);font-size:12px">#'+q.id+'</td>'
       +'<td style="white-space:nowrap;color:var(--gt)">'+fdate(q.created_at)+'</td>'
-      +'<td><div style="font-weight:600">'+q.nombre+'</div>'
-      +(q.telefono?'<div style="font-size:12px;color:var(--gt)">'+q.telefono+'</div>':'')
-      +(q.email?'<div style="font-size:12px;color:var(--gt)">'+q.email+'</div>':'')+'</td>'
-      +'<td><div style="font-weight:600">'+(q.marca||'')+' '+(q.modelo||'')+'</div>'
-      +'<div style="font-size:12px;color:var(--gt)">'+(q.anio||'')+(q.vin?' · '+q.vin:'')+'</div></td>'
-      +'<td><div style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+q.repuesto+'">'+q.repuesto+'</div></td>'
+      +'<td><div style="font-weight:600">'+esc(q.nombre)+'</div>'
+      +(q.telefono?'<div style="font-size:12px;color:var(--gt)">'+esc(q.telefono)+'</div>':'')
+      +(q.email?'<div style="font-size:12px;color:var(--gt)">'+esc(q.email)+'</div>':'')+'</td>'
+      +'<td><div style="font-weight:600">'+esc(q.marca||'')+' '+esc(q.modelo||'')+'</div>'
+      +'<div style="font-size:12px;color:var(--gt)">'+esc(q.anio||'')+(q.vin?' · '+esc(q.vin):'')+'</div></td>'
+      +'<td><div style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+esc(q.repuesto)+'">'+esc(q.repuesto)+'</div></td>'
       +'<td>'+bfuente(q.fuente)+'</td><td>'+bestado(q.estado)+'</td>'
       +'<td>'+bpago(q.pago_inicial)+'</td><td>'+bpago(q.pago_final)+'</td>'
       +'<td><button class="br" onclick="toggleExp('+q.id+')">'+(isExp?'▲ Cerrar':'▼ Ver detalle')+'</button>'
