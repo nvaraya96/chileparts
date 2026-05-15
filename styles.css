@@ -107,6 +107,15 @@ footer { background: var(--gris-medio); border-top: 1px solid var(--gris-borde);
 .footer-bottom { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--texto-gris); }
 .footer-bottom span { color: var(--rojo); }
 
+/* Pago Flow */
+.pago-flow { display: flex; align-items: stretch; margin-top: 48px; }
+.pago-step { flex: 1; background: var(--gris-medio); border: 1px solid var(--gris-borde); padding: 32px 24px; text-align: center; }
+.pago-step.highlight { border-color: var(--rojo); background: rgba(204,0,0,0.06); }
+.pago-pct { font-family: 'Bebas Neue', sans-serif; font-size: 64px; color: var(--rojo); display: block; line-height: 1; margin-bottom: 8px; }
+.pago-label { font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; display: block; margin-bottom: 12px; color: var(--blanco); }
+.pago-desc { font-size: 14px; color: var(--texto-gris); line-height: 1.6; }
+.pago-arrow { display: flex; align-items: center; justify-content: center; padding: 0 16px; font-size: 28px; color: var(--rojo); flex-shrink: 0; }
+
 /* WhatsApp */
 .wa-float { position: fixed; bottom: 32px; right: 32px; z-index: 999; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
 .wa-btn { width: 60px; height: 60px; background: #25D366; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; box-shadow: 0 4px 20px rgba(37,211,102,0.5); transition: all 0.2s; animation: wa-pulse 2.5s infinite; }
@@ -167,4 +176,26 @@ footer { background: var(--gris-medio); border-top: 1px solid var(--gris-borde);
 
   /* WhatsApp */
   .wa-float { bottom: 20px; right: 16px; }
+
+  /* Colapsar grids inline a 1 columna */
+  div[style*="grid-template-columns:1fr 1fr"],
+  div[style*="grid-template-columns: 1fr 1fr"],
+  ul[style*="grid-template-columns:1fr 1fr"],
+  div[style*="grid-template-columns:1fr 1.4fr"],
+  div[style*="grid-template-columns:repeat(3,1fr)"] {
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+  }
+  div[style*="grid-template-columns:repeat(4,1fr)"] {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 16px !important;
+  }
+  /* Reducir padding excesivo en grids del hero */
+  div[style*="padding:80px 40px"][style*="grid-template-columns"] {
+    padding: 32px 20px !important;
+  }
+
+  /* Pago flow vertical en móvil */
+  .pago-flow { flex-direction: column; }
+  .pago-arrow { padding: 4px 0; font-size: 20px; }
 }
