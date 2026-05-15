@@ -4,6 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Chile Parts | Panel Admin</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#CC0000">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="CP Admin">
+<link rel="apple-touch-icon" href="/admin-icon.svg">
 <style>
 :root{--r:#CC0000;--n:#0a0a0a;--g:#1a1a1a;--b:#2a2a2a;--w:#fff;--gt:#999}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -416,6 +423,10 @@ async function saveNew(){
 }
 
 setInterval(load,60000);
+
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/sw.js');
+}
 </script>
 </body>
 </html>
