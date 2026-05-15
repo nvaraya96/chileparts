@@ -85,7 +85,23 @@ textarea.inl{background:#111;border:1px solid var(--b);color:var(--w);padding:7p
 .empty{text-align:center;padding:60px;color:var(--gt);font-size:14px}
 .abar{padding:10px 24px;font-size:13px;display:none}
 .abar.ok{background:#0d3320;color:#4caf50}.abar.err{background:#2a0a0a;color:#ff6666}
-@media(max-width:768px){.sbar{grid-template-columns:repeat(2,1fr)}.fgrid{grid-template-columns:1fr}.drow{grid-template-columns:1fr}}
+@media(max-width:768px){
+  .sbar{grid-template-columns:repeat(2,1fr)}
+  .fgrid{grid-template-columns:1fr}
+  .drow{grid-template-columns:1fr}
+  .topbar{padding:10px 14px}
+  .tlogo{font-size:16px}
+  .toolbar{padding:10px 12px;gap:6px}
+  .chip{padding:8px 12px;font-size:13px}
+  .btnn{padding:10px 14px;font-size:13px}
+  .twrap{padding:0 0 16px}
+  table{display:none}
+  #card-list{display:block}
+  .stat{padding:14px 10px}
+  .sn{font-size:28px}
+  .sl{font-size:10px}
+}
+#card-list{display:none}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 </head>
@@ -147,6 +163,7 @@ textarea.inl{background:#111;border:1px solid var(--b);color:var(--w);padding:7p
       </tr></thead>
       <tbody id="tbody"></tbody>
     </table>
+    <div id="card-list"></div>
   </div>
 </div>
 
@@ -341,6 +358,43 @@ function detailHTML(q){
     +'</td></tr>';
 }
 
+function cardHTML(q){
+  const isExp=expanded===q.id;
+  return '<div style="background:var(--g);border:1px solid var(--b);border-radius:4px;margin-bottom:10px;overflow:hidden;">'
+    +'<div style="padding:14px 16px;cursor:pointer;" onclick="toggleExp('+q.id+')">'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">'
+    +'<div style="font-weight:700;font-size:15px;">'+q.nombre+'</div>'
+    +'<div style="font-size:11px;color:var(--gt)">'+fdate(q.created_at)+'</div></div>'
+    +'<div style="font-size:13px;color:var(--gt);margin-bottom:8px;">'+(q.marca||'')+' '+(q.modelo||'')+' '+(q.anio||'')+'</div>'
+    +'<div style="font-size:13px;color:#ccc;margin-bottom:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+q.repuesto+'</div>'
+    +'<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">'
+    +bestado(q.estado)+bfuente(q.fuente)
+    +'<div style="margin-left:auto;font-size:12px;color:var(--gt)">'+(isExp?'▲':'▼')+'</div>'
+    +'</div></div>'
+    +(isExp?'<div style="border-top:1px solid var(--b);padding:14px 16px;">'
+      +'<div style="margin-bottom:12px;"><div class="dlabel">Estado</div>'
+      +sel('estado',q.id,q.estado||'pendiente',[
+        ['pendiente','⏳ Pendiente'],
+        ['cotizacion_enviada','✉ Cotización enviada'],
+        ['confirmado','✅ Confirmado (50% pagado)'],
+        ['en_camino','🚢 En camino'],
+        ['listo_entrega','📦 Listo para entrega'],
+        ['entregado','🏁 Entregado'],
+        ['cancelado','❌ Cancelado']
+      ])+'</div>'
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">'
+      +'<div><div class="dlabel">50% inicial</div>'+sel('pago_inicial',q.id,q.pago_inicial,[['pendiente','⏳ Pendiente'],['pagado','✓ Pagado']])+'</div>'
+      +'<div><div class="dlabel">Saldo final</div>'+sel('pago_final',q.id,q.pago_final,[['pendiente','⏳ Pendiente'],['pagado','✓ Pagado']])+'</div>'
+      +'</div>'
+      +(q.telefono?'<div style="margin-bottom:8px;font-size:13px;color:#aaa;">📱 <a href="tel:'+q.telefono+'" style="color:#aaa;text-decoration:none;">'+q.telefono+'</a></div>':'')
+      +(q.email?'<div style="margin-bottom:8px;font-size:13px;color:#aaa;">✉ <a href="mailto:'+q.email+'" style="color:#aaa;text-decoration:none;">'+q.email+'</a></div>':'')
+      +'<div style="margin-bottom:12px;"><div class="dlabel">Nota interna</div>'
+      +'<textarea class="inl" onblur="upd('+q.id+',\'nota_interna\',this.value)">'+(q.nota_interna||'')+'</textarea></div>'
+      +'<button class="br bdel" onclick="del('+q.id+')" style="width:100%;margin-top:4px;">✕ Eliminar cotización</button>'
+      +'</div>':'')
+    +'</div>';
+}
+
 function render(){
   const rows=getFiltered();
   document.getElementById('s0').textContent=data.length;
@@ -349,9 +403,11 @@ function render(){
   document.getElementById('s3').textContent=data.filter(d=>d.estado==='en_camino').length;
   document.getElementById('s4').textContent=data.filter(d=>d.estado==='entregado').length;
   const tbl=document.getElementById('tbl');
+  const cards=document.getElementById('card-list');
   const status=document.getElementById('tbl-status');
-  if(!rows.length){status.textContent='Sin resultados para este filtro';status.style.display='block';tbl.style.display='none';return;}
+  if(!rows.length){status.textContent='Sin resultados para este filtro';status.style.display='block';tbl.style.display='none';cards.innerHTML='';return;}
   status.style.display='none';tbl.style.display='table';
+  cards.innerHTML=rows.map(q=>cardHTML(q)).join('');
   document.getElementById('tbody').innerHTML=rows.map(q=>{
     const isExp=expanded===q.id;
     const row='<tr style="'+(isExp?'background:rgba(204,0,0,.04)':'')+'">'

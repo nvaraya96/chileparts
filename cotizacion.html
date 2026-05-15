@@ -26,13 +26,13 @@
     </div>
     <form id="cotizacion-form">
       <div class="form-group"><label>Nombre Completo *</label><input type="text" placeholder="Tu nombre" name="nombre" required></div>
-      <div class="form-group"><label>Teléfono *</label><input type="tel" placeholder="+56 9 XXXX XXXX" name="telefono" required></div>
-      <div class="form-group full"><label>Email *</label><input type="email" placeholder="tu@email.com" name="email" required></div>
+      <div class="form-group"><label>Teléfono *</label><input type="tel" id="f-tel" placeholder="+56 9 XXXX XXXX" name="telefono" required><span id="tel-err" style="display:none;font-size:12px;color:#ff6666;margin-top:4px;display:block"></span></div>
+      <div class="form-group full"><label>Email *</label><input type="email" id="f-email" placeholder="tu@email.com" name="email" required><span id="email-err" style="display:none;font-size:12px;color:#ff6666;margin-top:4px;display:block"></span></div>
       <div class="form-group"><label>Marca del Vehículo *</label><input type="text" placeholder="Ej: BMW, Mercedes, Porsche" name="marca" required></div>
       <div class="form-group"><label>Modelo *</label><input type="text" placeholder="Ej: E36 328, C63 AMG, 911" name="modelo" required></div>
       <div class="form-group"><label>Año *</label><input type="number" placeholder="Ej: 1997" min="1950" max="2026" name="anio" required></div>
       <div class="form-group full"><label>Número de Chasis / VIN (recomendado)</label><input type="text" placeholder="Ej: WBABF710X0EH00001" name="vin"></div>
-      <div class="form-group full"><label>Parte o Repuesto que Necesitas *</label><textarea name="repuesto" placeholder="Describe la pieza con el mayor detalle posible. Si tienes el número de parte, inclúyelo. Ej: Bomba de agua BMW E36 M52B28, número de parte 11511740134" required></textarea></div>
+      <div class="form-group full"><label>Parte o Repuesto que Necesitas * <span id="char-count" style="float:right;color:var(--texto-gris);font-weight:400">0/300</span></label><textarea id="f-repuesto" name="repuesto" maxlength="300" placeholder="Describe la pieza con el mayor detalle posible. Si tienes el número de parte, inclúyelo. Ej: Bomba de agua BMW E36 M52B28, número de parte 11511740134" required></textarea></div>
       <div class="cf-turnstile" data-sitekey="0x4AAAAAADPdDzdEauejkfh-" data-theme="dark"></div>
       <button type="submit" class="submit-btn">🔍 Enviar Solicitud de Cotización</button>
       <div class="success-msg" id="success">✅ ¡Solicitud enviada! Te respondemos en menos de 24 horas hábiles.</div>
@@ -91,10 +91,49 @@
   </a>
 </div>
 <script>
+// Contador caracteres
+var rep = document.getElementById('f-repuesto');
+var cc = document.getElementById('char-count');
+if(rep && cc){
+  rep.addEventListener('input', function(){
+    cc.textContent = this.value.length+'/300';
+    cc.style.color = this.value.length >= 280 ? '#ff9800' : 'var(--texto-gris)';
+  });
+}
+
+function validarTelefono(v){
+  var clean = v.replace(/[\s\-().]/g,'');
+  return /^(\+?56)?9\d{8}$/.test(clean);
+}
+function validarEmail(v){
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+}
+
 var form = document.getElementById('cotizacion-form');
 if(form) {
   form.addEventListener('submit', async function(e) {
     e.preventDefault();
+
+    // Validar teléfono
+    var telVal = document.getElementById('f-tel').value.trim();
+    var telErr = document.getElementById('tel-err');
+    if(!validarTelefono(telVal)){
+      telErr.textContent = 'Ingresa un teléfono chileno válido. Ej: +56 9 1234 5678';
+      telErr.style.display = 'block';
+      document.getElementById('f-tel').focus();
+      return;
+    } else { telErr.style.display = 'none'; }
+
+    // Validar email
+    var emailVal = document.getElementById('f-email').value.trim();
+    var emailErr = document.getElementById('email-err');
+    if(!validarEmail(emailVal)){
+      emailErr.textContent = 'Ingresa un email válido. Ej: nombre@correo.com';
+      emailErr.style.display = 'block';
+      document.getElementById('f-email').focus();
+      return;
+    } else { emailErr.style.display = 'none'; }
+
     const token = document.querySelector('[name="cf-turnstile-response"]')?.value;
     if(!token){alert('Por favor completa la verificación de seguridad.');return;}
     const btn = form.querySelector('.submit-btn');
@@ -116,8 +155,7 @@ if(form) {
       tipo_vehiculo: vals.tipo_vehiculo || '',
       repuesto: vals.repuesto || '',
       fuente: 'web',
-      estado_cotizacion: 'pendiente_enviar',
-      estado_pedido: 'sin_pedido',
+      estado: 'pendiente',
       pago_inicial: 'pendiente',
       pago_final: 'pendiente'
     };
