@@ -14,17 +14,14 @@ body{background:var(--n);color:var(--w);font-family:'Segoe UI',Arial,sans-serif;
 .llogo span{color:var(--r)}
 .lsub{font-size:12px;color:var(--gt);letter-spacing:2px;text-transform:uppercase;margin-bottom:32px}
 label{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--gt);display:block;margin-bottom:6px}
-input[type=password],input[type=text]{width:100%;background:#111;border:1px solid var(--b);color:var(--w);padding:12px 14px;font-size:15px;border-radius:3px;outline:none;margin-bottom:16px;display:block}
-input[type=password]:focus,input[type=text]:focus{border-color:var(--r)}
+input[type=password],input[type=text],input[type=email]{width:100%;background:#111;border:1px solid var(--b);color:var(--w);padding:12px 14px;font-size:15px;border-radius:3px;outline:none;margin-bottom:16px;display:block}
+input[type=password]:focus,input[type=text]:focus,input[type=email]:focus{border-color:var(--r)}
 .btnl{width:100%;background:var(--r);color:#fff;border:none;padding:14px;font-size:14px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:3px;margin-bottom:12px}
 .btnl:hover{background:#aa0000}
-.btntest{width:100%;background:#333;color:#aaa;border:1px solid var(--b);padding:10px;font-size:12px;cursor:pointer;border-radius:3px;margin-bottom:12px;letter-spacing:1px}
-.btntest:hover{background:#444;color:var(--w)}
 .msg{padding:10px 14px;border-radius:3px;font-size:13px;margin-bottom:10px;display:none}
 .msg.ok{background:#0d3320;border:1px solid #4caf50;color:#4caf50}
 .msg.err{background:#2a0a0a;border:1px solid #ff6666;color:#ff6666}
 .msg.info{background:#1a2a3a;border:1px solid #5aafff;color:#5aafff}
-.hint{font-size:12px;color:var(--gt);text-align:center;margin-top:8px}
 #app{display:none}
 .topbar{background:var(--g);border-bottom:1px solid var(--b);padding:14px 24px;display:flex;align-items:center;justify-content:space-between}
 .tlogo{font-size:20px;font-weight:900;letter-spacing:2px}
@@ -83,6 +80,7 @@ textarea.inl{background:#111;border:1px solid var(--b);color:var(--w);padding:7p
 .abar.ok{background:#0d3320;color:#4caf50}.abar.err{background:#2a0a0a;color:#ff6666}
 @media(max-width:768px){.sbar{grid-template-columns:repeat(2,1fr)}.fgrid{grid-template-columns:1fr}.drow{grid-template-columns:1fr}}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 </head>
 <body>
 
@@ -91,15 +89,15 @@ textarea.inl{background:#111;border:1px solid var(--b);color:var(--w);padding:7p
     <div class="llogo">CHILE<span>PARTS</span></div>
     <div class="lsub">Panel de Administración</div>
 
-    <div class="msg info" id="msg-info">✓ JavaScript funcionando correctamente</div>
     <div class="msg err" id="msg-err"></div>
     <div class="msg ok" id="msg-ok"></div>
+    <div class="msg info" id="msg-info"></div>
 
+    <label>Email</label>
+    <input type="email" id="email" placeholder="correo@ejemplo.com">
     <label>Contraseña</label>
     <input type="password" id="pwd" placeholder="Ingresa tu contraseña">
     <button class="btnl" id="btnLogin">Ingresar al Panel</button>
-    <button class="btntest" id="btnTest">🔌 Probar conexión con Supabase</button>
-    <div class="hint">Contraseña: <strong style="color:#fff">chileparts2025</strong></div>
   </div>
 </div>
 
@@ -181,13 +179,20 @@ textarea.inl{background:#111;border:1px solid var(--b);color:var(--w);padding:7p
 
 <script>
 const SU='https://cgsbrbwfsenidwrjekyk.supabase.co';
-const SK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNnc2JyYndmc2VuaWR3cmpla3lrIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3ODY5NzExNCwiZXhwIjoyMDk0MjczMTE0fQ.5o2-Wea5HpdcgyTgh_g4aYFD796YONDrMEmH5gh45V8';
-const PASS='chileparts2025';
+const SK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNnc2JyYndmc2VuaWR3cmpla3lrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTcxMTQsImV4cCI6MjA5NDI3MzExNH0.awEZdfKi353WGDmag0qFhAGR1eXXZtoLZSnVkb4NG74';
 const TB='cotizaciones';
-let data=[],filter='all',expanded=null;
+const sb=supabase.createClient(SU,SK);
+let data=[],filter='all',expanded=null,_session=null;
 
-// Show JS is working
-document.getElementById('msg-info').style.display='block';
+(async()=>{
+  const{data:{session}}=await sb.auth.getSession();
+  if(session){
+    _session=session;
+    document.getElementById('login').style.display='none';
+    document.getElementById('app').style.display='block';
+    load();
+  }
+})();
 
 function showMsg(id,txt){
   ['msg-info','msg-err','msg-ok'].forEach(x=>{document.getElementById(x).style.display='none';});
@@ -204,50 +209,38 @@ function showAlert(txt,isErr){
   setTimeout(()=>a.style.display='none',4000);
 }
 
-document.getElementById('btnLogin').addEventListener('click',function(){
+document.getElementById('btnLogin').addEventListener('click',async function(){
+  const email=document.getElementById('email').value.trim();
   const pwd=document.getElementById('pwd').value;
-  if(!pwd){showMsg('msg-err','Ingresa la contraseña');return;}
-  if(pwd===PASS){
-    document.getElementById('login').style.display='none';
-    document.getElementById('app').style.display='block';
-    load();
-  }else{
-    showMsg('msg-err','Contraseña incorrecta. Usa: chileparts2025');
-  }
+  if(!email||!pwd){showMsg('msg-err','Completa email y contraseña');return;}
+  this.textContent='Ingresando...';this.disabled=true;
+  const{data:d,error}=await sb.auth.signInWithPassword({email,password:pwd});
+  this.textContent='Ingresar al Panel';this.disabled=false;
+  if(error){showMsg('msg-err','Credenciales incorrectas');return;}
+  _session=d.session;
+  document.getElementById('login').style.display='none';
+  document.getElementById('app').style.display='block';
+  load();
 });
 
 document.getElementById('pwd').addEventListener('keydown',function(e){
   if(e.key==='Enter') document.getElementById('btnLogin').click();
 });
 
-document.getElementById('btnTest').addEventListener('click',async function(){
-  showMsg('msg-info','Probando conexión con Supabase...');
-  try{
-    const r=await fetch(SU+'/rest/v1/'+TB+'?limit=1',{
-      headers:{'apikey':SK,'Authorization':'Bearer '+SK}
-    });
-    if(r.ok){
-      const d=await r.json();
-      showMsg('msg-ok','✅ Conexión exitosa! Tabla encontrada. Registros visibles: '+d.length);
-    }else{
-      const t=await r.text();
-      showMsg('msg-err','⚠ Error HTTP '+r.status+': '+t.slice(0,100));
-    }
-  }catch(e){
-    showMsg('msg-err','⚠ Error de red: '+e.message);
-  }
-});
-
-function doLogout(){
+async function doLogout(){
+  await sb.auth.signOut();
+  _session=null;
   document.getElementById('login').style.display='flex';
   document.getElementById('app').style.display='none';
+  document.getElementById('email').value='';
   document.getElementById('pwd').value='';
-  showMsg('msg-info','✓ JavaScript funcionando correctamente');
+  showMsg('msg-info','Sesión cerrada');
 }
 
 async function api(method,path,body){
+  const token=_session?.access_token;
   const opts={method,headers:{
-    'apikey':SK,'Authorization':'Bearer '+SK,'Content-Type':'application/json',
+    'apikey':SK,'Authorization':'Bearer '+token,'Content-Type':'application/json',
     'Prefer':method==='POST'?'return=representation':'return=minimal'
   }};
   if(body) opts.body=JSON.stringify(body);
@@ -270,7 +263,7 @@ async function load(){
   }catch(e){
     sync.style.color='#ff6666';
     sync.textContent='⚠ Error';
-    document.getElementById('tbl-status').textContent='Error: '+e.message+' — ¿Ejecutaste el SQL en Supabase?';
+    document.getElementById('tbl-status').textContent='Error: '+e.message;
     document.getElementById('tbl-status').style.display='block';
     console.error(e);
   }
@@ -299,7 +292,7 @@ function bpago(s){return s==='pagado'?b('bpag','✓ Pagado'):b('bnopag','⏳ Pen
 function fdate(d){try{return new Date(d).toLocaleDateString('es-CL',{day:'2-digit',month:'2-digit',year:'2-digit'});}catch(e){return '';}}
 
 function sel(field,id,val,opts){
-  return '<select class="inl" onchange="upd('+id+',''+field+'',this.value)">'+
+  return '<select class="inl" onchange="upd('+id+',\''+field+'\',this.value)">'+
     opts.map(o=>'<option value="'+o[0]+'"'+(val===o[0]?' selected':'')+'>'+o[1]+'</option>').join('')+'</select>';
 }
 
@@ -322,12 +315,12 @@ function detailHTML(q){
     +'<div class="drow"><div><div class="dlabel">Courier</div>'
     +sel('courier',q.id,q.courier||'',[['','Sin asignar'],['Chile Express','Chile Express'],['Starken','Starken'],['Retiro en Santiago','Retiro Santiago'],['Otro','Otro']])
     +'</div><div><div class="dlabel">N° Tracking</div>'
-    +'<input class="inl" value="'+(q.tracking||'')+'" placeholder="Número seguimiento" onblur="upd('+q.id+','tracking',this.value)"></div></div>'
+    +'<input class="inl" value="'+(q.tracking||'')+'" placeholder="Número seguimiento" onblur="upd('+q.id+',\'tracking\',this.value)"></div></div>'
     +'<div class="drow"><div><div class="dlabel">Fecha estimada</div>'
-    +'<input class="inl" type="date" value="'+(q.fecha_estimada||'')+'" onchange="upd('+q.id+','fecha_estimada',this.value)"></div>'
+    +'<input class="inl" type="date" value="'+(q.fecha_estimada||'')+'" onchange="upd('+q.id+',\'fecha_estimada\',this.value)"></div>'
     +'<div><div class="dlabel">Repuesto</div><div style="font-size:13px;color:#ccc;line-height:1.5">'+q.repuesto+'</div></div></div>'
     +'<div class="drow"><div class="dfull"><div class="dlabel">Nota interna</div>'
-    +'<textarea class="inl" onblur="upd('+q.id+','nota_interna',this.value)">'+(q.nota_interna||'')+'</textarea></div></div>'
+    +'<textarea class="inl" onblur="upd('+q.id+',\'nota_interna\',this.value)">'+(q.nota_interna||'')+'</textarea></div></div>'
     +'</td></tr>';
 }
 
