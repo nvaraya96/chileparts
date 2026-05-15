@@ -119,20 +119,23 @@ textarea.inl{background:#111;border:1px solid var(--b);color:var(--w);padding:7p
   <div class="abar" id="abar"></div>
   <div class="sbar">
     <div class="stat"><div class="sn" id="s0">—</div><div class="sl">Total</div></div>
-    <div class="stat"><div class="sn" id="s1">—</div><div class="sl">Pend. enviar</div></div>
+    <div class="stat"><div class="sn" id="s1">—</div><div class="sl">Pendientes</div></div>
     <div class="stat"><div class="sn" id="s2">—</div><div class="sl">Cot. enviadas</div></div>
-    <div class="stat"><div class="sn" id="s3">—</div><div class="sl">En tránsito</div></div>
-    <div class="stat"><div class="sn" id="s4">—</div><div class="sl">Saldo pendiente</div></div>
+    <div class="stat"><div class="sn" id="s3">—</div><div class="sl">En camino</div></div>
+    <div class="stat"><div class="sn" id="s4">—</div><div class="sl">Entregados</div></div>
   </div>
   <div class="toolbar">
     <button class="chip on" onclick="sf('all',this)">Todas</button>
-    <button class="chip" onclick="sf('pendiente_enviar',this)">⏳ Pend. enviar</button>
-    <button class="chip" onclick="sf('cotizacion_enviada',this)">✓ Enviadas</button>
-    <button class="chip" onclick="sf('en_transito',this)">🚢 En tránsito</button>
-    <button class="chip" onclick="sf('entregado',this)">✅ Entregadas</button>
+    <button class="chip" onclick="sf('pendiente',this)">⏳ Pendiente</button>
+    <button class="chip" onclick="sf('cotizacion_enviada',this)">✉ Cot. enviada</button>
+    <button class="chip" onclick="sf('confirmado',this)">✅ Confirmado</button>
+    <button class="chip" onclick="sf('en_camino',this)">🚢 En camino</button>
+    <button class="chip" onclick="sf('listo_entrega',this)">📦 Listo entrega</button>
+    <button class="chip" onclick="sf('entregado',this)">🏁 Entregado</button>
+    <button class="chip" onclick="sf('cancelado',this)">❌ Cancelado</button>
     <button class="chip" onclick="sf('web',this)">🌐 Web</button>
-    <button class="chip" onclick="sf('whatsapp',this)">📱 WhatsApp</button>
-    <button class="chip" onclick="sf('instagram',this)">📸 Instagram</button>
+    <button class="chip" onclick="sf('whatsapp',this)">📱 WA</button>
+    <button class="chip" onclick="sf('instagram',this)">📸 IG</button>
     <button class="btnn" onclick="openM()">+ Nueva cotización</button>
   </div>
   <div class="twrap">
@@ -140,7 +143,7 @@ textarea.inl{background:#111;border:1px solid var(--b);color:var(--w);padding:7p
     <table id="tbl" style="display:none">
       <thead><tr>
         <th>#</th><th>Fecha</th><th>Cliente</th><th>Vehículo</th><th>Repuesto</th>
-        <th>Fuente</th><th>Cotización</th><th>Pedido</th><th>50% ini</th><th>Saldo</th><th>Acciones</th>
+        <th>Fuente</th><th>Estado</th><th>50% ini</th><th>Saldo</th><th>Acciones</th>
       </tr></thead>
       <tbody id="tbody"></tbody>
     </table>
@@ -281,19 +284,22 @@ function sf(f,el){filter=f;document.querySelectorAll('.chip').forEach(c=>c.class
 function getFiltered(){
   if(filter==='all') return data;
   if(['web','whatsapp','instagram'].includes(filter)) return data.filter(d=>d.fuente===filter);
-  if(['pendiente_enviar','cotizacion_enviada'].includes(filter)) return data.filter(d=>d.estado_cotizacion===filter);
-  return data.filter(d=>d.estado_pedido===filter);
+  return data.filter(d=>d.estado===filter);
 }
 
 function b(cls,txt){return '<span class="badge '+cls+'">'+txt+'</span>';}
 function bfuente(f){return f==='whatsapp'?b('bwa','📱 WA'):f==='instagram'?b('big','📸 IG'):b('bweb','🌐 Web');}
-function bcot(s){return s==='cotizacion_enviada'?b('benv','✓ Enviada'):b('bpenv','⏳ Pend. enviar');}
-function bped(s){
-  const m={sin_pedido:['bsp','—'],buscando_proveedor:['bsp','🔍 Buscando'],
-    proveedor_confirmado:['bprov','✓ Proveedor'],pedido_realizado:['bped','📋 Realizado'],
-    en_transito:['btra','🚢 Tránsito'],en_aduana:['badu','🛃 Aduana'],
-    listo_entrega:['blis','📦 Listo'],entregado:['bent','✅ Entregado']};
-  const v=m[s]||['bsp','—']; return b(v[0],v[1]);
+function bestado(s){
+  const m={
+    pendiente:      ['bpenv','⏳ Pendiente'],
+    cotizacion_enviada:['benv','✉ Cot. enviada'],
+    confirmado:     ['bpag','✅ Confirmado'],
+    en_camino:      ['btra','🚢 En camino'],
+    listo_entrega:  ['blis','📦 Listo entrega'],
+    entregado:      ['bent','🏁 Entregado'],
+    cancelado:      ['bnopag','❌ Cancelado']
+  };
+  const v=m[s]||['bsp','⏳ Pendiente']; return b(v[0],v[1]);
 }
 function bpago(s){return s==='pagado'?b('bpag','✓ Pagado'):b('bnopag','⏳ Pendiente');}
 function fdate(d){try{return new Date(d).toLocaleDateString('es-CL',{day:'2-digit',month:'2-digit',year:'2-digit'});}catch(e){return '';}}
@@ -304,13 +310,17 @@ function sel(field,id,val,opts){
 }
 
 function detailHTML(q){
-  return '<tr id="det-'+q.id+'"><td colspan="11" style="padding:16px 20px;background:rgba(204,0,0,.03)">'
-    +'<div class="drow"><div><div class="dlabel">Estado cotización</div>'
-    +sel('estado_cotizacion',q.id,q.estado_cotizacion,[['pendiente_enviar','⏳ Pendiente de enviar'],['cotizacion_enviada','✓ Cotización enviada']])
-    +'</div><div><div class="dlabel">Estado pedido</div>'
-    +sel('estado_pedido',q.id,q.estado_pedido,[['sin_pedido','— Sin pedido'],['buscando_proveedor','🔍 Buscando proveedor'],
-      ['proveedor_confirmado','✓ Proveedor confirmado'],['pedido_realizado','📋 Pedido realizado'],
-      ['en_transito','🚢 En tránsito'],['en_aduana','🛃 En aduana'],['listo_entrega','📦 Listo'],['entregado','✅ Entregado']])
+  return '<tr id="det-'+q.id+'"><td colspan="10" style="padding:16px 20px;background:rgba(204,0,0,.03)">'
+    +'<div class="drow"><div class="dfull"><div class="dlabel">Estado del pedido</div>'
+    +sel('estado',q.id,q.estado||'pendiente',[
+      ['pendiente','⏳ Pendiente'],
+      ['cotizacion_enviada','✉ Cotización enviada'],
+      ['confirmado','✅ Confirmado (50% pagado)'],
+      ['en_camino','🚢 En camino'],
+      ['listo_entrega','📦 Listo para entrega'],
+      ['entregado','🏁 Entregado'],
+      ['cancelado','❌ Cancelado']
+    ])
     +'</div></div>'
     +'<div class="drow"><div><div class="dlabel">Pago inicial 50%</div>'
     +sel('pago_inicial',q.id,q.pago_inicial,[['pendiente','⏳ Pendiente'],['pagado','✓ Pagado']])
@@ -334,10 +344,10 @@ function detailHTML(q){
 function render(){
   const rows=getFiltered();
   document.getElementById('s0').textContent=data.length;
-  document.getElementById('s1').textContent=data.filter(d=>d.estado_cotizacion==='pendiente_enviar').length;
-  document.getElementById('s2').textContent=data.filter(d=>d.estado_cotizacion==='cotizacion_enviada').length;
-  document.getElementById('s3').textContent=data.filter(d=>d.estado_pedido==='en_transito').length;
-  document.getElementById('s4').textContent=data.filter(d=>d.pago_final==='pendiente'&&d.estado_pedido!=='sin_pedido').length;
+  document.getElementById('s1').textContent=data.filter(d=>d.estado==='pendiente').length;
+  document.getElementById('s2').textContent=data.filter(d=>d.estado==='cotizacion_enviada').length;
+  document.getElementById('s3').textContent=data.filter(d=>d.estado==='en_camino').length;
+  document.getElementById('s4').textContent=data.filter(d=>d.estado==='entregado').length;
   const tbl=document.getElementById('tbl');
   const status=document.getElementById('tbl-status');
   if(!rows.length){status.textContent='Sin resultados para este filtro';status.style.display='block';tbl.style.display='none';return;}
@@ -353,8 +363,8 @@ function render(){
       +'<td><div style="font-weight:600">'+(q.marca||'')+' '+(q.modelo||'')+'</div>'
       +'<div style="font-size:12px;color:var(--gt)">'+(q.anio||'')+(q.vin?' · '+q.vin:'')+'</div></td>'
       +'<td><div style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+q.repuesto+'">'+q.repuesto+'</div></td>'
-      +'<td>'+bfuente(q.fuente)+'</td><td>'+bcot(q.estado_cotizacion)+'</td>'
-      +'<td>'+bped(q.estado_pedido)+'</td><td>'+bpago(q.pago_inicial)+'</td><td>'+bpago(q.pago_final)+'</td>'
+      +'<td>'+bfuente(q.fuente)+'</td><td>'+bestado(q.estado)+'</td>'
+      +'<td>'+bpago(q.pago_inicial)+'</td><td>'+bpago(q.pago_final)+'</td>'
       +'<td><button class="br" onclick="toggleExp('+q.id+')">'+(isExp?'▲ Cerrar':'▼ Ver detalle')+'</button>'
       +'<button class="br bdel" onclick="del('+q.id+')">✕ Eliminar</button></td></tr>';
     return row+(isExp?detailHTML(q):'');
@@ -412,7 +422,7 @@ async function saveNew(){
       tipo_vehiculo:document.getElementById('ftp').value||null,
       nota_interna:document.getElementById('fni').value.trim()||null,
       fuente:document.getElementById('fsrc').value,
-      estado_cotizacion:'pendiente_enviar',estado_pedido:'sin_pedido',
+      estado:'pendiente',
       pago_inicial:'pendiente',pago_final:'pendiente'
     });
     const created=Array.isArray(result)?result[0]:result;
