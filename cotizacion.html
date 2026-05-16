@@ -161,7 +161,7 @@ if(form) {
     };
 
     try {
-      const r = await fetch('https://cgsbrbwfsenidwrjekyk.supabase.co/functions/v1/cotizar', {
+      const r = await fetch('https://cgsbrbwfsenidwrjekyk.supabase.co/functions/v1/smart-endpoint', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token, ...body })
