@@ -350,9 +350,9 @@ function detailHTML(q){
     +'<div class="drow"><div><div class="dlabel">Courier</div>'
     +sel('courier',q.id,q.courier||'',[['','Sin asignar'],['Chile Express','Chile Express'],['Starken','Starken'],['Retiro en Santiago','Retiro Santiago'],['Otro','Otro']])
     +'</div><div><div class="dlabel">N° Tracking</div>'
-    +'<input class="inl" value="'+(q.tracking||'')+'" placeholder="Número seguimiento" onblur="upd('+q.id+',\'tracking\',this.value)"></div></div>'
+    +'<input class="inl" value="'+esc(q.tracking||'')+'" placeholder="Número seguimiento" onblur="upd('+q.id+',\'tracking\',this.value)"></div></div>'
     +'<div class="drow"><div><div class="dlabel">Fecha estimada</div>'
-    +'<input class="inl" type="date" value="'+(q.fecha_estimada||'')+'" onchange="upd('+q.id+',\'fecha_estimada\',this.value)"></div>'
+    +'<input class="inl" type="date" value="'+esc(q.fecha_estimada||'')+'" onchange="upd('+q.id+',\'fecha_estimada\',this.value)"></div>'
     +'<div><div class="dlabel">Repuesto</div><div style="font-size:13px;color:#ccc;line-height:1.5">'+esc(q.repuesto)+'</div></div></div>'
     +'<div class="drow"><div class="dfull"><div class="dlabel">Nota interna</div>'
     +'<textarea class="inl" onblur="upd('+q.id+',\'nota_interna\',this.value)">'+esc(q.nota_interna||'')+'</textarea></div></div>'
