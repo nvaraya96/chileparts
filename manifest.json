@@ -1,6 +1,6 @@
 {
-  "name": "ChileParts Admin",
-  "short_name": "CP Admin",
+  "name": "ChileParts",
+  "short_name": "ChileParts",
   "description": "Panel de control Chile Parts",
   "start_url": "/admin.html",
   "scope": "/",

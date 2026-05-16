@@ -221,6 +221,15 @@ let data=[],filter='all',expanded=null,_session=null;
   }
 })();
 
+sb.auth.onAuthStateChange((event,session)=>{
+  if(event==='SIGNED_OUT'||!session){
+    _session=null;
+    document.getElementById('login').style.display='flex';
+    document.getElementById('app').style.display='none';
+    showMsg('msg-info','Sesión expirada. Inicia sesión de nuevo.');
+  }
+});
+
 function showMsg(id,txt){
   ['msg-info','msg-err','msg-ok'].forEach(x=>{document.getElementById(x).style.display='none';});
   const el=document.getElementById(id);
@@ -305,6 +314,7 @@ function getFiltered(){
 }
 
 function esc(s){if(!s)return '';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+function sid(id){return parseInt(id)||0;}
 function b(cls,txt){return '<span class="badge '+cls+'">'+txt+'</span>';}
 function bfuente(f){return f==='whatsapp'?b('bwa','📱 WA'):f==='instagram'?b('big','📸 IG'):b('bweb','🌐 Web');}
 function bestado(s){
@@ -330,7 +340,7 @@ function sel(field,id,val,opts){
 function detailHTML(q){
   return '<tr id="det-'+q.id+'"><td colspan="10" style="padding:16px 20px;background:rgba(204,0,0,.03)">'
     +'<div class="drow"><div class="dfull"><div class="dlabel">Estado del pedido</div>'
-    +sel('estado',q.id,q.estado||'pendiente',[
+    +sel('estado',sid(q.id),q.estado||'pendiente',[
       ['pendiente','⏳ Pendiente'],
       ['cotizacion_enviada','✉ Cotización enviada'],
       ['confirmado','✅ Confirmado (50% pagado)'],
@@ -341,28 +351,28 @@ function detailHTML(q){
     ])
     +'</div></div>'
     +'<div class="drow"><div><div class="dlabel">Pago inicial 50%</div>'
-    +sel('pago_inicial',q.id,q.pago_inicial,[['pendiente','⏳ Pendiente'],['pagado','✓ Pagado']])
-    +sel('pago_inicial_medio',q.id,q.pago_inicial_medio||'',[['','Medio...'],['transferencia','🏦 Transferencia'],['flow','Flow']])
+    +sel('pago_inicial',sid(q.id),q.pago_inicial,[['pendiente','⏳ Pendiente'],['pagado','✓ Pagado']])
+    +sel('pago_inicial_medio',sid(q.id),q.pago_inicial_medio||'',[['','Medio...'],['transferencia','🏦 Transferencia'],['flow','Flow']])
     +'</div><div><div class="dlabel">Saldo final 50%</div>'
-    +sel('pago_final',q.id,q.pago_final,[['pendiente','⏳ Pendiente'],['pagado','✓ Pagado']])
-    +sel('pago_final_medio',q.id,q.pago_final_medio||'',[['','Medio...'],['transferencia','🏦 Transferencia'],['flow','Flow']])
+    +sel('pago_final',sid(q.id),q.pago_final,[['pendiente','⏳ Pendiente'],['pagado','✓ Pagado']])
+    +sel('pago_final_medio',sid(q.id),q.pago_final_medio||'',[['','Medio...'],['transferencia','🏦 Transferencia'],['flow','Flow']])
     +'</div></div>'
     +'<div class="drow"><div><div class="dlabel">Courier</div>'
-    +sel('courier',q.id,q.courier||'',[['','Sin asignar'],['Chile Express','Chile Express'],['Starken','Starken'],['Retiro en Santiago','Retiro Santiago'],['Otro','Otro']])
+    +sel('courier',sid(q.id),q.courier||'',[['','Sin asignar'],['Chile Express','Chile Express'],['Starken','Starken'],['Retiro en Santiago','Retiro Santiago'],['Otro','Otro']])
     +'</div><div><div class="dlabel">N° Tracking</div>'
-    +'<input class="inl" value="'+esc(q.tracking||'')+'" placeholder="Número seguimiento" onblur="upd('+q.id+',\'tracking\',this.value)"></div></div>'
+    +'<input class="inl" value="'+esc(q.tracking||'')+'" placeholder="Número seguimiento" onblur="upd('+sid(q.id)+',\'tracking\',this.value)"></div></div>'
     +'<div class="drow"><div><div class="dlabel">Fecha estimada</div>'
-    +'<input class="inl" type="date" value="'+esc(q.fecha_estimada||'')+'" onchange="upd('+q.id+',\'fecha_estimada\',this.value)"></div>'
+    +'<input class="inl" type="date" value="'+esc(q.fecha_estimada||'')+'" onchange="upd('+sid(q.id)+',\'fecha_estimada\',this.value)"></div>'
     +'<div><div class="dlabel">Repuesto</div><div style="font-size:13px;color:#ccc;line-height:1.5">'+esc(q.repuesto)+'</div></div></div>'
     +'<div class="drow"><div class="dfull"><div class="dlabel">Nota interna</div>'
-    +'<textarea class="inl" onblur="upd('+q.id+',\'nota_interna\',this.value)">'+esc(q.nota_interna||'')+'</textarea></div></div>'
+    +'<textarea class="inl" onblur="upd('+sid(q.id)+',\'nota_interna\',this.value)">'+esc(q.nota_interna||'')+'</textarea></div></div>'
     +'</td></tr>';
 }
 
 function cardHTML(q){
   const isExp=expanded===q.id;
   return '<div style="background:var(--g);border:1px solid var(--b);border-radius:4px;margin-bottom:10px;overflow:hidden;">'
-    +'<div style="padding:14px 16px;cursor:pointer;" onclick="toggleExp('+q.id+')">'
+    +'<div style="padding:14px 16px;cursor:pointer;" onclick="toggleExp('+sid(q.id)+')">'
     +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">'
     +'<div style="font-weight:700;font-size:15px;">'+esc(q.nombre)+'</div>'
     +'<div style="font-size:11px;color:var(--gt)">'+fdate(q.created_at)+'</div></div>'
@@ -374,7 +384,7 @@ function cardHTML(q){
     +'</div></div>'
     +(isExp?'<div style="border-top:1px solid var(--b);padding:14px 16px;">'
       +'<div style="margin-bottom:12px;"><div class="dlabel">Estado</div>'
-      +sel('estado',q.id,q.estado||'pendiente',[
+      +sel('estado',sid(q.id),q.estado||'pendiente',[
         ['pendiente','⏳ Pendiente'],
         ['cotizacion_enviada','✉ Cotización enviada'],
         ['confirmado','✅ Confirmado (50% pagado)'],
@@ -384,14 +394,14 @@ function cardHTML(q){
         ['cancelado','❌ Cancelado']
       ])+'</div>'
       +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">'
-      +'<div><div class="dlabel">50% inicial</div>'+sel('pago_inicial',q.id,q.pago_inicial,[['pendiente','⏳ Pendiente'],['pagado','✓ Pagado']])+'</div>'
-      +'<div><div class="dlabel">Saldo final</div>'+sel('pago_final',q.id,q.pago_final,[['pendiente','⏳ Pendiente'],['pagado','✓ Pagado']])+'</div>'
+      +'<div><div class="dlabel">50% inicial</div>'+sel('pago_inicial',sid(q.id),q.pago_inicial,[['pendiente','⏳ Pendiente'],['pagado','✓ Pagado']])+'</div>'
+      +'<div><div class="dlabel">Saldo final</div>'+sel('pago_final',sid(q.id),q.pago_final,[['pendiente','⏳ Pendiente'],['pagado','✓ Pagado']])+'</div>'
       +'</div>'
       +(q.telefono?'<div style="margin-bottom:8px;font-size:13px;color:#aaa;">📱 <a href="tel:'+esc(q.telefono)+'" style="color:#aaa;text-decoration:none;">'+esc(q.telefono)+'</a></div>':'')
       +(q.email?'<div style="margin-bottom:8px;font-size:13px;color:#aaa;">✉ <a href="mailto:'+esc(q.email)+'" style="color:#aaa;text-decoration:none;">'+esc(q.email)+'</a></div>':'')
       +'<div style="margin-bottom:12px;"><div class="dlabel">Nota interna</div>'
-      +'<textarea class="inl" onblur="upd('+q.id+',\'nota_interna\',this.value)">'+esc(q.nota_interna||'')+'</textarea></div>'
-      +'<button class="br bdel" onclick="del('+q.id+')" style="width:100%;margin-top:4px;">✕ Eliminar cotización</button>'
+      +'<textarea class="inl" onblur="upd('+sid(q.id)+',\'nota_interna\',this.value)">'+esc(q.nota_interna||'')+'</textarea></div>'
+      +'<button class="br bdel" onclick="del('+sid(q.id)+')" style="width:100%;margin-top:4px;">✕ Eliminar cotización</button>'
       +'</div>':'')
     +'</div>';
 }
@@ -422,8 +432,8 @@ function render(){
       +'<td><div style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+esc(q.repuesto)+'">'+esc(q.repuesto)+'</div></td>'
       +'<td>'+bfuente(q.fuente)+'</td><td>'+bestado(q.estado)+'</td>'
       +'<td>'+bpago(q.pago_inicial)+'</td><td>'+bpago(q.pago_final)+'</td>'
-      +'<td><button class="br" onclick="toggleExp('+q.id+')">'+(isExp?'▲ Cerrar':'▼ Ver detalle')+'</button>'
-      +'<button class="br bdel" onclick="del('+q.id+')">✕ Eliminar</button></td></tr>';
+      +'<td><button class="br" onclick="toggleExp('+sid(q.id)+')">'+(isExp?'▲ Cerrar':'▼ Ver detalle')+'</button>'
+      +'<button class="br bdel" onclick="del('+sid(q.id)+')">✕ Eliminar</button></td></tr>';
     return row+(isExp?detailHTML(q):'');
   }).join('');
 }
