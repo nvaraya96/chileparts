@@ -26,7 +26,14 @@
     </div>
     <form id="cotizacion-form">
       <div class="form-group"><label>Nombre Completo *</label><input type="text" placeholder="Tu nombre" name="nombre" required></div>
-      <div class="form-group"><label>Teléfono *</label><input type="tel" id="f-tel" placeholder="+56 9 XXXX XXXX" name="telefono" required><span id="tel-err" style="display:none;font-size:12px;color:#ff6666;margin-top:4px;display:block"></span></div>
+      <div class="form-group">
+        <label>Teléfono *</label>
+        <div style="display:flex;align-items:stretch;">
+          <span style="background:#222;border:1px solid var(--gris-borde);border-right:none;padding:14px 14px;font-size:15px;color:#aaa;border-radius:2px 0 0 2px;white-space:nowrap;font-family:'Barlow',sans-serif;letter-spacing:1px;">+569</span>
+          <input type="tel" id="f-tel" placeholder="XXXXXXXX" name="telefono" maxlength="8" pattern="[0-9]{8}" required style="border-radius:0 2px 2px 0;flex:1;">
+        </div>
+        <span id="tel-err" style="display:none;font-size:12px;color:#ff6666;margin-top:4px;display:block"></span>
+      </div>
       <div class="form-group full"><label>Email *</label><input type="email" id="f-email" placeholder="tu@email.com" name="email" required><span id="email-err" style="display:none;font-size:12px;color:#ff6666;margin-top:4px;display:block"></span></div>
       <div class="form-group"><label>Marca del Vehículo *</label><input type="text" placeholder="Ej: BMW, Mercedes, Porsche" name="marca" required></div>
       <div class="form-group"><label>Modelo *</label><input type="text" placeholder="Ej: E36 328, C63 AMG, 911" name="modelo" required></div>
@@ -91,6 +98,14 @@
   </a>
 </div>
 <script>
+// Solo permite dígitos en el campo teléfono
+var telInput = document.getElementById('f-tel');
+if(telInput){
+  telInput.addEventListener('input', function(){
+    this.value = this.value.replace(/\D/g,'').slice(0,8);
+  });
+}
+
 // Contador caracteres
 var rep = document.getElementById('f-repuesto');
 var cc = document.getElementById('char-count');
@@ -102,8 +117,7 @@ if(rep && cc){
 }
 
 function validarTelefono(v){
-  var clean = v.replace(/[\s\-().]/g,'');
-  return /^(\+?56)?9\d{8}$/.test(clean);
+  return /^\d{8}$/.test(v.trim());
 }
 function validarEmail(v){
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
@@ -114,11 +128,11 @@ if(form) {
   form.addEventListener('submit', async function(e) {
     e.preventDefault();
 
-    // Validar teléfono
+    // Validar teléfono (solo los 8 dígitos, el prefijo +569 es fijo)
     var telVal = document.getElementById('f-tel').value.trim();
     var telErr = document.getElementById('tel-err');
     if(!validarTelefono(telVal)){
-      telErr.textContent = 'Ingresa un teléfono chileno válido. Ej: +56 9 1234 5678';
+      telErr.textContent = 'Ingresa los 8 dígitos de tu número. Ej: 12345678';
       telErr.style.display = 'block';
       document.getElementById('f-tel').focus();
       return;
@@ -146,7 +160,7 @@ if(form) {
 
     const body = {
       nombre: vals.nombre || '',
-      telefono: vals.telefono || '',
+      telefono: vals.telefono ? '+569' + vals.telefono : '',
       email: vals.email || '',
       marca: vals.marca || '',
       modelo: vals.modelo || '',
