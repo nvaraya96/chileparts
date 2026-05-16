@@ -38,16 +38,20 @@ Deno.serve(async (req) => {
     return jsonRes(corsHeaders, 405, { error: 'Método no permitido' })
   }
 
+  const ct = req.headers.get('content-type') || ''
+  if (!ct.includes('application/json')) {
+    return jsonRes(corsHeaders, 415, { error: 'Formato no soportado' })
+  }
+
   try {
     const body = await req.json()
     const { token, nombre, telefono, email, marca, modelo, anio, vin, tipo_vehiculo, repuesto } = body
 
-    // 1. Verificar token Turnstile con timeout
     if (!token) {
       return jsonRes(corsHeaders, 400, { error: 'Captcha requerido' })
     }
 
-    let tsData: { success: boolean }
+    let tsData: { success: boolean; hostname?: string; challenge_ts?: string }
     try {
       const tsRes = await fetchWithTimeout(
         'https://challenges.cloudflare.com/turnstile/v0/siteverify',
@@ -64,11 +68,17 @@ Deno.serve(async (req) => {
       return jsonRes(corsHeaders, 503, { error: 'Servicio de verificación no disponible. Intenta de nuevo.' })
     }
 
-    if (!tsData.success) {
+    if (!tsData.success || tsData.hostname !== 'chileparts.cl') {
       return jsonRes(corsHeaders, 400, { error: 'Verificación de seguridad fallida' })
     }
 
-    // 2. Validar campos requeridos
+    if (tsData.challenge_ts) {
+      const ageMs = Date.now() - new Date(tsData.challenge_ts).getTime()
+      if (ageMs > 5 * 60 * 1000) {
+        return jsonRes(corsHeaders, 400, { error: 'Verificación expirada. Por favor recarga la página.' })
+      }
+    }
+
     if (!nombre?.trim() || !repuesto?.trim()) {
       return jsonRes(corsHeaders, 400, { error: 'Nombre y repuesto son requeridos' })
     }
@@ -82,15 +92,29 @@ Deno.serve(async (req) => {
       return jsonRes(corsHeaders, 400, { error: 'Descripción demasiado larga (máx 300 caracteres)' })
     }
 
-    // Validar año si se envía
-    if (anio) {
-      const anioNum = parseInt(anio)
-      if (isNaN(anioNum) || anioNum < 1886 || anioNum > 2030) {
-        return jsonRes(corsHeaders, 400, { error: 'Año inválido' })
+    if (email?.trim()) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      if (!emailRegex.test(email.trim())) {
+        return jsonRes(corsHeaders, 400, { error: 'Email inválido' })
       }
     }
 
-    // 3. Insertar en Supabase con service_role key
+    if (telefono?.trim()) {
+      const telRegex = /^[\d\s+\-()]{6,25}$/
+      if (!telRegex.test(telefono.trim())) {
+        return jsonRes(corsHeaders, 400, { error: 'Teléfono inválido' })
+      }
+    }
+
+    let anioNum: number | null = null
+    if (anio) {
+      const parsed = parseInt(anio)
+      if (isNaN(parsed) || parsed < 1886 || parsed > 2030) {
+        return jsonRes(corsHeaders, 400, { error: 'Año inválido' })
+      }
+      anioNum = parsed
+    }
+
     const supabaseUrl = Deno.env.get('SUPABASE_URL')
     const serviceKey  = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
 
@@ -108,12 +132,12 @@ Deno.serve(async (req) => {
           },
           body: JSON.stringify({
             nombre:        nombre.trim().slice(0, 100),
-            telefono:      telefono?.trim().slice(0, 20)  || null,
-            email:         email?.trim().slice(0, 100)    || null,
-            marca:         marca?.trim().slice(0, 50)     || null,
-            modelo:        modelo?.trim().slice(0, 50)    || null,
-            anio:          anio?.trim().slice(0, 10)      || null,
-            vin:           vin?.trim().slice(0, 30)       || null,
+            telefono:      telefono?.trim().slice(0, 25)      || null,
+            email:         email?.trim().slice(0, 100)        || null,
+            marca:         marca?.trim().slice(0, 50)         || null,
+            modelo:        modelo?.trim().slice(0, 50)        || null,
+            anio:          anioNum,
+            vin:           vin?.trim().slice(0, 30)           || null,
             tipo_vehiculo: tipo_vehiculo?.trim().slice(0, 50) || null,
             repuesto:      repuesto.trim().slice(0, 300),
             fuente:        'web',
@@ -130,7 +154,6 @@ Deno.serve(async (req) => {
     }
 
     if (!insertRes.ok) {
-      // Log interno pero NO exponer al cliente
       const errText = await insertRes.text()
       console.error('Supabase insert error:', errText)
       return jsonRes(corsHeaders, 500, { error: 'Error al procesar la solicitud. Por favor intenta de nuevo.' })

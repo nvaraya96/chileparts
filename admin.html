@@ -103,7 +103,10 @@ textarea.inl{background:#111;border:1px solid var(--b);color:var(--w);padding:7p
 }
 #card-list{display:none}
 </style>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.105.4/dist/umd/supabase.js"
+  integrity="sha384-7SfFUrg31wOnGWBLLniKFCNmCSguYA5wI1WPDOt7kP/mom4R9/0pwghVEnv0uwYP"
+  crossorigin="anonymous"
+  referrerpolicy="no-referrer"></script>
 </head>
 <body>
 
@@ -117,9 +120,9 @@ textarea.inl{background:#111;border:1px solid var(--b);color:var(--w);padding:7p
     <div class="msg info" id="msg-info"></div>
 
     <label>Email</label>
-    <input type="email" id="email" placeholder="correo@ejemplo.com">
+    <input type="email" id="email" placeholder="correo@ejemplo.com" autocomplete="username">
     <label>Contraseña</label>
-    <input type="password" id="pwd" placeholder="Ingresa tu contraseña">
+    <input type="password" id="pwd" placeholder="Ingresa tu contraseña" autocomplete="current-password">
     <button class="btnl" id="btnLogin">Ingresar al Panel</button>
   </div>
 </div>
@@ -129,7 +132,7 @@ textarea.inl{background:#111;border:1px solid var(--b);color:var(--w);padding:7p
     <div class="tlogo">CHILE<span>PARTS</span>&nbsp;<span style="font-size:13px;font-weight:400;color:var(--gt)">Panel Admin</span></div>
     <div class="tright">
       <span class="sync" id="sync">● Conectando...</span>
-      <button class="btnout" onclick="doLogout()">Salir</button>
+      <button class="btnout">Salir</button>
     </div>
   </div>
   <div class="abar" id="abar"></div>
@@ -141,18 +144,18 @@ textarea.inl{background:#111;border:1px solid var(--b);color:var(--w);padding:7p
     <div class="stat"><div class="sn" id="s4">—</div><div class="sl">Entregados</div></div>
   </div>
   <div class="toolbar">
-    <button class="chip on" onclick="sf('all',this)">Todas</button>
-    <button class="chip" onclick="sf('pendiente',this)">⏳ Pendiente</button>
-    <button class="chip" onclick="sf('cotizacion_enviada',this)">✉ Cot. enviada</button>
-    <button class="chip" onclick="sf('confirmado',this)">✅ Confirmado</button>
-    <button class="chip" onclick="sf('en_camino',this)">🚢 En camino</button>
-    <button class="chip" onclick="sf('listo_entrega',this)">📦 Listo entrega</button>
-    <button class="chip" onclick="sf('entregado',this)">🏁 Entregado</button>
-    <button class="chip" onclick="sf('cancelado',this)">❌ Cancelado</button>
-    <button class="chip" onclick="sf('web',this)">🌐 Web</button>
-    <button class="chip" onclick="sf('whatsapp',this)">📱 WA</button>
-    <button class="chip" onclick="sf('instagram',this)">📸 IG</button>
-    <button class="btnn" onclick="openM()">+ Nueva cotización</button>
+    <button class="chip on" data-filter="all">Todas</button>
+    <button class="chip" data-filter="pendiente">⏳ Pendiente</button>
+    <button class="chip" data-filter="cotizacion_enviada">✉ Cot. enviada</button>
+    <button class="chip" data-filter="confirmado">✅ Confirmado</button>
+    <button class="chip" data-filter="en_camino">🚢 En camino</button>
+    <button class="chip" data-filter="listo_entrega">📦 Listo entrega</button>
+    <button class="chip" data-filter="entregado">🏁 Entregado</button>
+    <button class="chip" data-filter="cancelado">❌ Cancelado</button>
+    <button class="chip" data-filter="web">🌐 Web</button>
+    <button class="chip" data-filter="whatsapp">📱 WA</button>
+    <button class="chip" data-filter="instagram">📸 IG</button>
+    <button class="btnn">+ Nueva cotización</button>
   </div>
   <div class="twrap">
     <div class="empty" id="tbl-status">Cargando...</div>
@@ -171,9 +174,9 @@ textarea.inl{background:#111;border:1px solid var(--b);color:var(--w);padding:7p
   <div class="modal">
     <h2>Nueva cotización</h2>
     <div class="srctabs">
-      <button class="sbtn on" onclick="setSrc('web',this)">🌐 Web</button>
-      <button class="sbtn" onclick="setSrc('whatsapp',this)">📱 WhatsApp</button>
-      <button class="sbtn" onclick="setSrc('instagram',this)">📸 Instagram</button>
+      <button class="sbtn on" data-src="web">🌐 Web</button>
+      <button class="sbtn" data-src="whatsapp">📱 WhatsApp</button>
+      <button class="sbtn" data-src="instagram">📸 Instagram</button>
     </div>
     <input type="hidden" id="fsrc" value="web">
     <div class="fgrid">
@@ -198,8 +201,8 @@ textarea.inl{background:#111;border:1px solid var(--b);color:var(--w);padding:7p
     <div class="frow"><label>Repuesto *</label><textarea id="fr" placeholder="Describe la pieza..."></textarea></div>
     <div class="frow"><label>Nota interna</label><textarea id="fni" placeholder="Solo visible para ti..." style="min-height:50px"></textarea></div>
     <div class="mact">
-      <button class="btncanc" onclick="closeM()">Cancelar</button>
-      <button class="btnn" id="btnSave" onclick="saveNew()">Guardar cotización</button>
+      <button class="btncanc">Cancelar</button>
+      <button class="btnn" id="btnSave">Guardar cotización</button>
     </div>
   </div>
 </div>
@@ -208,32 +211,9 @@ textarea.inl{background:#111;border:1px solid var(--b);color:var(--w);padding:7p
 const SU='https://cgsbrbwfsenidwrjekyk.supabase.co';
 const SK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNnc2JyYndmc2VuaWR3cmpla3lrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTcxMTQsImV4cCI6MjA5NDI3MzExNH0.awEZdfKi353WGDmag0qFhAGR1eXXZtoLZSnVkb4NG74';
 const TB='cotizaciones';
-const sb=supabase.createClient(SU,SK);
+const CAMPOS=new Set(['estado','pago_inicial','pago_inicial_medio','pago_final','pago_final_medio','courier','tracking','fecha_estimada','nota_interna']);
+const sb=supabase.createClient(SU,SK,{auth:{detectSessionInUrl:false,storageKey:'cp-admin'}});
 let data=[],filter='all',expanded=null,_session=null;
-
-(async()=>{
-  const{data:{session}}=await sb.auth.getSession();
-  if(session){
-    _session=session;
-    document.getElementById('login').style.display='none';
-    document.getElementById('app').style.display='block';
-    load();
-  }
-})();
-
-sb.auth.onAuthStateChange((event,session)=>{
-  if(event==='TOKEN_REFRESHED'&&session){
-    _session=session;
-  } else if(event==='SIGNED_OUT'||!session){
-    _session=null;
-    data=[];
-    document.getElementById('tbody').innerHTML='';
-    document.getElementById('card-list').innerHTML='';
-    document.getElementById('login').style.display='flex';
-    document.getElementById('app').style.display='none';
-    showMsg('msg-info','Sesión expirada. Inicia sesión de nuevo.');
-  }
-});
 
 function showMsg(id,txt){
   ['msg-info','msg-err','msg-ok'].forEach(x=>{document.getElementById(x).style.display='none';});
@@ -266,6 +246,30 @@ document.getElementById('btnLogin').addEventListener('click',async function(){
 
 document.getElementById('pwd').addEventListener('keydown',function(e){
   if(e.key==='Enter') document.getElementById('btnLogin').click();
+});
+
+(async()=>{
+  const{data:{session}}=await sb.auth.getSession();
+  if(session){
+    _session=session;
+    document.getElementById('login').style.display='none';
+    document.getElementById('app').style.display='block';
+    load();
+  }
+})();
+
+sb.auth.onAuthStateChange((event,session)=>{
+  if(event==='TOKEN_REFRESHED'&&session){
+    _session=session;
+  } else if(event==='SIGNED_OUT'||!session){
+    _session=null;
+    data=[];
+    document.getElementById('tbody').innerHTML='';
+    document.getElementById('card-list').innerHTML='';
+    document.getElementById('login').style.display='flex';
+    document.getElementById('app').style.display='none';
+    showMsg('msg-info','Sesión expirada. Inicia sesión de nuevo.');
+  }
 });
 
 async function doLogout(){
@@ -307,7 +311,7 @@ async function load(){
   }catch(e){
     sync.style.color='#ff6666';
     sync.textContent='⚠ Error';
-    document.getElementById('tbl-status').textContent='Error: '+e.message;
+    document.getElementById('tbl-status').textContent='Error al cargar datos';
     document.getElementById('tbl-status').style.display='block';
     console.error(e);
   }
@@ -341,7 +345,7 @@ function bpago(s){return s==='pagado'?b('bpag','✓ Pagado'):b('bnopag','⏳ Pen
 function fdate(d){try{return new Date(d).toLocaleDateString('es-CL',{day:'2-digit',month:'2-digit',year:'2-digit'});}catch(e){return '';}}
 
 function sel(field,id,val,opts){
-  return '<select class="inl" onchange="upd('+id+',\''+field+'\',this.value)">'+
+  return '<select class="inl" data-id="'+id+'" data-field="'+field+'">'+
     opts.map(o=>'<option value="'+o[0]+'"'+(val===o[0]?' selected':'')+'>'+o[1]+'</option>').join('')+'</select>';
 }
 
@@ -368,19 +372,19 @@ function detailHTML(q){
     +'<div class="drow"><div><div class="dlabel">Courier</div>'
     +sel('courier',sid(q.id),q.courier||'',[['','Sin asignar'],['Chile Express','Chile Express'],['Starken','Starken'],['Retiro en Santiago','Retiro Santiago'],['Otro','Otro']])
     +'</div><div><div class="dlabel">N° Tracking</div>'
-    +'<input class="inl" value="'+esc(q.tracking||'')+'" placeholder="Número seguimiento" onblur="upd('+sid(q.id)+',\'tracking\',this.value)"></div></div>'
+    +'<input class="inl" value="'+esc(q.tracking||'')+'" placeholder="Número seguimiento" data-id="'+sid(q.id)+'" data-field="tracking"></div></div>'
     +'<div class="drow"><div><div class="dlabel">Fecha estimada</div>'
-    +'<input class="inl" type="date" value="'+esc(q.fecha_estimada||'')+'" onchange="upd('+sid(q.id)+',\'fecha_estimada\',this.value)"></div>'
+    +'<input class="inl" type="date" value="'+esc(q.fecha_estimada||'')+'" data-id="'+sid(q.id)+'" data-field="fecha_estimada"></div>'
     +'<div><div class="dlabel">Repuesto</div><div style="font-size:13px;color:#ccc;line-height:1.5">'+esc(q.repuesto)+'</div></div></div>'
     +'<div class="drow"><div class="dfull"><div class="dlabel">Nota interna</div>'
-    +'<textarea class="inl" onblur="upd('+sid(q.id)+',\'nota_interna\',this.value)">'+esc(q.nota_interna||'')+'</textarea></div></div>'
+    +'<textarea class="inl" data-id="'+sid(q.id)+'" data-field="nota_interna">'+esc(q.nota_interna||'')+'</textarea></div></div>'
     +'</td></tr>';
 }
 
 function cardHTML(q){
   const isExp=expanded===q.id;
   return '<div style="background:var(--g);border:1px solid var(--b);border-radius:4px;margin-bottom:10px;overflow:hidden;">'
-    +'<div style="padding:14px 16px;cursor:pointer;" onclick="toggleExp('+sid(q.id)+')">'
+    +'<div style="padding:14px 16px;cursor:pointer;" data-action="toggleExp" data-id="'+sid(q.id)+'">'
     +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">'
     +'<div style="font-weight:700;font-size:15px;">'+esc(q.nombre)+'</div>'
     +'<div style="font-size:11px;color:var(--gt)">'+fdate(q.created_at)+'</div></div>'
@@ -405,11 +409,11 @@ function cardHTML(q){
       +'<div><div class="dlabel">50% inicial</div>'+sel('pago_inicial',sid(q.id),q.pago_inicial,[['pendiente','⏳ Pendiente'],['pagado','✓ Pagado']])+'</div>'
       +'<div><div class="dlabel">Saldo final</div>'+sel('pago_final',sid(q.id),q.pago_final,[['pendiente','⏳ Pendiente'],['pagado','✓ Pagado']])+'</div>'
       +'</div>'
-      +(q.telefono?'<div style="margin-bottom:8px;font-size:13px;color:#aaa;">📱 <a href="tel:'+esc(q.telefono)+'" style="color:#aaa;text-decoration:none;">'+esc(q.telefono)+'</a></div>':'')
-      +(q.email?'<div style="margin-bottom:8px;font-size:13px;color:#aaa;">✉ <a href="mailto:'+esc(q.email)+'" style="color:#aaa;text-decoration:none;">'+esc(q.email)+'</a></div>':'')
+      +(q.telefono?'<div style="margin-bottom:8px;font-size:13px;color:#aaa;">📱 <span style="color:#aaa;">'+esc(q.telefono)+'</span></div>':'')
+      +(q.email?'<div style="margin-bottom:8px;font-size:13px;color:#aaa;">✉ <span style="color:#aaa;">'+esc(q.email)+'</span></div>':'')
       +'<div style="margin-bottom:12px;"><div class="dlabel">Nota interna</div>'
-      +'<textarea class="inl" onblur="upd('+sid(q.id)+',\'nota_interna\',this.value)">'+esc(q.nota_interna||'')+'</textarea></div>'
-      +'<button class="br bdel" onclick="del('+sid(q.id)+')" style="width:100%;margin-top:4px;">✕ Eliminar cotización</button>'
+      +'<textarea class="inl" data-id="'+sid(q.id)+'" data-field="nota_interna">'+esc(q.nota_interna||'')+'</textarea></div>'
+      +'<button class="br bdel" data-action="del" data-id="'+sid(q.id)+'" style="width:100%;margin-top:4px;">✕ Eliminar cotización</button>'
       +'</div>':'')
     +'</div>';
 }
@@ -430,7 +434,7 @@ function render(){
   document.getElementById('tbody').innerHTML=rows.map(q=>{
     const isExp=expanded===q.id;
     const row='<tr style="'+(isExp?'background:rgba(204,0,0,.04)':'')+'">'
-      +'<td style="color:var(--gt);font-size:12px">#'+q.id+'</td>'
+      +'<td style="color:var(--gt);font-size:12px">#'+esc(String(q.id))+'</td>'
       +'<td style="white-space:nowrap;color:var(--gt)">'+fdate(q.created_at)+'</td>'
       +'<td><div style="font-weight:600">'+esc(q.nombre)+'</div>'
       +(q.telefono?'<div style="font-size:12px;color:var(--gt)">'+esc(q.telefono)+'</div>':'')
@@ -440,8 +444,8 @@ function render(){
       +'<td><div style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+esc(q.repuesto)+'">'+esc(q.repuesto)+'</div></td>'
       +'<td>'+bfuente(q.fuente)+'</td><td>'+bestado(q.estado)+'</td>'
       +'<td>'+bpago(q.pago_inicial)+'</td><td>'+bpago(q.pago_final)+'</td>'
-      +'<td><button class="br" onclick="toggleExp('+sid(q.id)+')">'+(isExp?'▲ Cerrar':'▼ Ver detalle')+'</button>'
-      +'<button class="br bdel" onclick="del('+sid(q.id)+')">✕ Eliminar</button></td></tr>';
+      +'<td><button class="br" data-action="toggleExp" data-id="'+sid(q.id)+'">'+(isExp?'▲ Cerrar':'▼ Ver detalle')+'</button>'
+      +'<button class="br bdel" data-action="del" data-id="'+sid(q.id)+'">✕ Eliminar</button></td></tr>';
     return row+(isExp?detailHTML(q):'');
   }).join('');
 }
@@ -449,12 +453,13 @@ function render(){
 function toggleExp(id){expanded=expanded===id?null:id;render();}
 
 async function upd(id,field,value){
+  if(!CAMPOS.has(field)){showAlert('Campo no permitido',true);return;}
   try{
     await api('PATCH',TB+'?id=eq.'+id,{[field]:value});
     const item=data.find(d=>d.id===id);
     if(item) item[field]=value;
     render();showAlert('✓ Guardado',false);
-  }catch(e){showAlert('Error: '+e.message,true);}
+  }catch(e){showAlert('Error al guardar',true);}
 }
 
 async function del(id){
@@ -466,7 +471,7 @@ async function del(id){
     data=data.filter(d=>d.id!==id);
     if(expanded===id) expanded=null;
     render();showAlert('Cotización eliminada',false);
-  }catch(e){showAlert('Error: '+e.message,true);}
+  }catch(e){showAlert('Error al eliminar',true);}
 }
 
 function setSrc(s,el){
@@ -479,7 +484,6 @@ function closeM(){
   document.getElementById('modal').classList.remove('show');
   ['fn','ft','fe','fm','fmo','fa','fv','fr','fni'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('ftp').value='';
-  // Reset fuente a Web
   document.getElementById('fsrc').value='web';
   document.querySelectorAll('.sbtn').forEach(b=>b.classList.remove('on'));
   document.querySelector('.sbtn').classList.add('on');
@@ -509,19 +513,62 @@ async function saveNew(){
     const created=Array.isArray(result)?result[0]:result;
     if(created) data.unshift(created);
     closeM();render();showAlert('✓ Cotización guardada',false);
-  }catch(e){showAlert('Error: '+e.message,true);}
+  }catch(e){showAlert('Error al guardar cotización',false);}
   btn.textContent='Guardar cotización';btn.disabled=false;
 }
+
+function handleActionClick(e){
+  const el=e.target.closest('[data-action]');
+  if(!el) return;
+  const safeId=sid(el.dataset.id);
+  if(el.dataset.action==='toggleExp') toggleExp(safeId);
+  else if(el.dataset.action==='del') del(safeId);
+}
+
+function handleFieldChange(e){
+  const el=e.target;
+  if(!el.dataset.field||!el.dataset.id) return;
+  if(el.tagName==='SELECT'||(el.tagName==='INPUT'&&el.type==='date')){
+    upd(sid(el.dataset.id),el.dataset.field,el.value);
+  }
+}
+
+function handleFieldBlur(e){
+  const el=e.target;
+  if(!el.dataset.field||!el.dataset.id) return;
+  if((el.tagName==='INPUT'&&el.type!=='date')||el.tagName==='TEXTAREA'){
+    upd(sid(el.dataset.id),el.dataset.field,el.value);
+  }
+}
+
+function setupEvents(){
+  document.querySelector('.btnout').addEventListener('click',doLogout);
+  document.querySelector('.toolbar').addEventListener('click',e=>{
+    const chip=e.target.closest('[data-filter]');
+    if(chip){sf(chip.dataset.filter,chip);return;}
+    if(e.target.closest('.btnn')) openM();
+  });
+  document.querySelector('.srctabs').addEventListener('click',e=>{
+    const btn=e.target.closest('[data-src]');
+    if(btn) setSrc(btn.dataset.src,btn);
+  });
+  document.querySelector('.btncanc').addEventListener('click',closeM);
+  document.getElementById('btnSave').addEventListener('click',saveNew);
+  ['tbody','card-list'].forEach(id=>{
+    const el=document.getElementById(id);
+    el.addEventListener('click',handleActionClick);
+    el.addEventListener('change',handleFieldChange);
+    el.addEventListener('focusout',handleFieldBlur);
+  });
+}
+
+setupEvents();
 
 setInterval(()=>{
   const a=document.activeElement;
   const editando=a&&(a.tagName==='TEXTAREA'||a.tagName==='INPUT'||a.tagName==='SELECT');
   if(!editando) load();
 },60000);
-
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('/sw.js');
-}
 </script>
 </body>
 </html>
