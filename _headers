@@ -14,3 +14,6 @@
   Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
   Cache-Control: no-store, no-cache, must-revalidate
   Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self' https://cgsbrbwfsenidwrjekyk.supabase.co; img-src 'self' data:; style-src 'self' 'unsafe-inline'; font-src 'self'; object-src 'none'; base-uri 'self';
+
+/sw.js
+  Cache-Control: no-cache, max-age=0, must-revalidate

@@ -222,8 +222,13 @@ let data=[],filter='all',expanded=null,_session=null;
 })();
 
 sb.auth.onAuthStateChange((event,session)=>{
-  if(event==='SIGNED_OUT'||!session){
+  if(event==='TOKEN_REFRESHED'&&session){
+    _session=session;
+  } else if(event==='SIGNED_OUT'||!session){
     _session=null;
+    data=[];
+    document.getElementById('tbody').innerHTML='';
+    document.getElementById('card-list').innerHTML='';
     document.getElementById('login').style.display='flex';
     document.getElementById('app').style.display='none';
     showMsg('msg-info','Sesión expirada. Inicia sesión de nuevo.');
@@ -266,6 +271,9 @@ document.getElementById('pwd').addEventListener('keydown',function(e){
 async function doLogout(){
   await sb.auth.signOut();
   _session=null;
+  data=[];expanded=null;
+  document.getElementById('tbody').innerHTML='';
+  document.getElementById('card-list').innerHTML='';
   document.getElementById('login').style.display='flex';
   document.getElementById('app').style.display='none';
   document.getElementById('email').value='';
@@ -314,7 +322,7 @@ function getFiltered(){
 }
 
 function esc(s){if(!s)return '';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
-function sid(id){return parseInt(id)||0;}
+function sid(id){const n=parseInt(id);return(Number.isInteger(n)&&n>0)?n:null;}
 function b(cls,txt){return '<span class="badge '+cls+'">'+txt+'</span>';}
 function bfuente(f){return f==='whatsapp'?b('bwa','📱 WA'):f==='instagram'?b('big','📸 IG'):b('bweb','🌐 Web');}
 function bestado(s){
@@ -450,7 +458,9 @@ async function upd(id,field,value){
 }
 
 async function del(id){
-  if(!confirm('¿Eliminar permanentemente?')) return;
+  if(!id){showAlert('ID inválido',true);return;}
+  if(!confirm('¿Eliminar esta cotización?\n\nEsta acción es permanente e irreversible.')) return;
+  if(!confirm('¿Confirmas que deseas eliminar permanentemente?')) return;
   try{
     await api('DELETE',TB+'?id=eq.'+id);
     data=data.filter(d=>d.id!==id);
