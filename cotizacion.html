@@ -161,15 +161,10 @@ if(form) {
     };
 
     try {
-      const r = await fetch('https://cgsbrbwfsenidwrjekyk.supabase.co/rest/v1/cotizaciones', {
+      const r = await fetch('https://cgsbrbwfsenidwrjekyk.supabase.co/functions/v1/cotizar', {
         method: 'POST',
-        headers: {
-          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNnc2JyYndmc2VuaWR3cmpla3lrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTcxMTQsImV4cCI6MjA5NDI3MzExNH0.awEZdfKi353WGDmag0qFhAGR1eXXZtoLZSnVkb4NG74',
-          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNnc2JyYndmc2VuaWR3cmpla3lrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTcxMTQsImV4cCI6MjA5NDI3MzExNH0.awEZdfKi353WGDmag0qFhAGR1eXXZtoLZSnVkb4NG74',
-          'Content-Type': 'application/json',
-          'Prefer': 'return=minimal'
-        },
-        body: JSON.stringify(body)
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token, ...body })
       });
 
       if(r.ok || r.status === 201) {
