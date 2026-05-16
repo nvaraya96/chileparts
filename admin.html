@@ -459,6 +459,10 @@ function closeM(){
   document.getElementById('modal').classList.remove('show');
   ['fn','ft','fe','fm','fmo','fa','fv','fr','fni'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('ftp').value='';
+  // Reset fuente a Web
+  document.getElementById('fsrc').value='web';
+  document.querySelectorAll('.sbtn').forEach(b=>b.classList.remove('on'));
+  document.querySelector('.sbtn').classList.add('on');
 }
 
 async function saveNew(){
@@ -489,7 +493,11 @@ async function saveNew(){
   btn.textContent='Guardar cotización';btn.disabled=false;
 }
 
-setInterval(load,60000);
+setInterval(()=>{
+  const a=document.activeElement;
+  const editando=a&&(a.tagName==='TEXTAREA'||a.tagName==='INPUT'||a.tagName==='SELECT');
+  if(!editando) load();
+},60000);
 
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('/sw.js');
