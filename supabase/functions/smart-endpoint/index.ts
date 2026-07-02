@@ -68,7 +68,8 @@ Deno.serve(async (req) => {
       return jsonRes(corsHeaders, 503, { error: 'Servicio de verificación no disponible. Intenta de nuevo.' })
     }
 
-    if (!tsData.success || tsData.hostname !== 'chileparts.cl') {
+    const allowedHosts = ['chileparts.cl', 'www.chileparts.cl']
+    if (!tsData.success || !allowedHosts.includes(tsData.hostname || '')) {
       return jsonRes(corsHeaders, 400, { error: 'Verificación de seguridad fallida' })
     }
 
